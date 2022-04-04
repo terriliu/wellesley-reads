@@ -12,7 +12,7 @@ create table user (
     uname varchar(10),
     pwd varchar(20),
     bio varchar(100),
-    fav_genres set('romance', 'comedy', 'thriller', 'nonfiction', 'fiction', 'horror'), -- TODO: add more genres
+    fav_genres set('romance', 'mystery', 'thriller', 'nonfiction', 'fiction', 'horror'), -- TODO: add more genres
     primary key (`uid`),
     index (uname)
 )
