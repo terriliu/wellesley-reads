@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+<p>Click to <a href="{{ url_for('index') }}">return to the main page</a>.</p>
+
+<h1>Form Data</h1>
+
+<p>The form was submitted by {{method}}.</p>
+
+<ul>
+    {% for key in form_data.keys() %}
+    <li><b class="key">{{key}}</b>
+        <ul>
+            {# getlist is a special method on Flask multi-dicts #}
+            {# it gets the list of all values for that key #}
+            {% for val in form_data.getlist(key) %}
+            <li>{{val}}</li>
+            {% endfor %}
+        </ul></li>
+    {% endfor %}
+</ul>
+
+{% endblock %}
