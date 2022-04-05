@@ -10,9 +10,8 @@ drop table if exists user;
 create table user (
     `uid` int unsigned,
     uname varchar(10),
-    pwd varchar(20),
     bio varchar(100),
-    fav_genres set('romance', 'mystery', 'thriller', 'nonfiction', 'fiction', 'horror'), -- TODO: add more genres
+    fav_genres set('romance', 'mystery', 'science-fiction', 'nonfiction', 'fiction', 'horror'), -- TODO: add more genres
     primary key (`uid`),
     index (uname)
 )
@@ -33,9 +32,9 @@ ENGINE = InnoDB;
 
 create table book (
     bid int unsigned, -- book id
-    bname varchar(20),
-    author varchar(20),
-    genre set('romance', 'comedy', 'thriller', 'nonfiction', 'fiction', 'horror'),
+    bname varchar(40), -- should be longer?
+    author varchar(30), -- should be longer?
+    genre set('romance', 'mystery', 'science-fiction', 'nonfiction', 'fiction', 'horror'),
     avg_rating float unsigned,
     primary key (bid),
     index (bname)
