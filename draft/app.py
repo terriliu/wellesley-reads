@@ -1,6 +1,7 @@
 from flask import (Flask, render_template, make_response, url_for, request,
                    redirect, flash, session, send_from_directory, jsonify)
 from werkzeug.utils import secure_filename
+import functions # helper functions
 app = Flask(__name__)
 
 # one or the other of these. Defaults to MySQL (PyMySQL)
@@ -25,6 +26,14 @@ app.config['TRAP_BAD_REQUEST_ERRORS'] = True
 def index():
     return render_template('main.html',title='Hello')
 
+@app.route('/user/<uid>', methods=['GET'])
+def user_profile(uid):
+    conn = dbi.connect()
+    user_info = functions.get_user_info(conn, uid) # example of calling helper functions
+    uname = user_info.get('uname')
+    return render_template('user_profile.html', name = uname)
+
+# Below routes are from the flask starter
 @app.route('/greet/', methods=["GET", "POST"])
 def greet():
     if request.method == 'GET':
@@ -66,8 +75,7 @@ def testform():
 @app.before_first_request
 def init_db():
     dbi.cache_cnf()
-    # set this local variable to 'wmdb' or your personal or team db
-    db_to_use = 'put_database_name_here_db' 
+    db_to_use = 'wellesleyreads_db' 
     dbi.use(db_to_use)
     print('will connect to {}'.format(db_to_use))
 
