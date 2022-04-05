@@ -13,9 +13,8 @@ drop table if exists user;
 create table user (
     `uid` int auto_increment,
     uname varchar(10),
-    pwd varchar(20),
     bio varchar(100),
-    fav_genres set('romance', 'comedy', 'thriller', 'nonfiction', 'fiction', 'horror'), -- TODO: add more genres
+    fav_genres set('romance', 'mystery', 'science-fiction', 'nonfiction', 'fiction', 'horror'), -- TODO: add more genres
     primary key (`uid`),
     index (uname)
 )
@@ -36,9 +35,9 @@ ENGINE = InnoDB;
 
 create table book (
     bid int auto_increment, -- book id
-    bname varchar(20),
-    author varchar(20),
-    genre set('romance', 'comedy', 'thriller', 'nonfiction', 'fiction', 'horror'),
+    bname varchar(40),
+    author varchar(30),
+    genre set('romance', 'mystery', 'science-fiction', 'nonfiction', 'fiction', 'horror'),
     avg_rating float unsigned,
     primary key (bid),
     index (bname)
@@ -48,7 +47,7 @@ ENGINE = InnoDB;
 create table shelf (
     shelf_id int auto_increment,
     `uid` int,
-    bname varchar(50),
+    bname varchar(40),
     primary key (shelf_id),
     foreign key (`uid`) references user (`uid`)
         on update cascade
