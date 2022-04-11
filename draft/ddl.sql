@@ -47,7 +47,7 @@ ENGINE = InnoDB;
 create table shelf (
     shelf_id int auto_increment,
     `uid` int,
-    bname varchar(40),
+    shelf_name varchar(40),
     primary key (shelf_id),
     foreign key (`uid`) references user (`uid`)
         on update cascade
