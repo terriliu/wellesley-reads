@@ -28,10 +28,36 @@ def index():
 
 @app.route('/user/<uid>', methods=['GET'])
 def user_profile(uid):
-    conn = dbi.connect()
-    user_info = functions.get_user_info(conn, uid) # example of calling helper functions
+    conn1 = dbi.connect()
+    user_info = functions.get_user_info(conn1, uid) # example of calling helper functions
     uname = user_info.get('uname')
-    return render_template('user_profile.html', name = uname)
+    bio = user_info.get('bio')
+    fav_genres = user_info.get('fav_genres')
+    conn2 = dbi.connect()
+    friends = functions.get_friends(conn2, uid)
+    conn3 = dbi.connect()
+    shelves = functions.get_shelves(conn3, uid)
+    return render_template('user_profile.html', name = uname, bio = bio, 
+                            genres = fav_genres, friends = friends,
+                            shelves = shelves)
+
+@app.route('/shelf/<shelf_id>', methods=['GET'])
+def display_shelf(shelf_id):
+    conn = dbi.connect()
+    books = functions.get_books(conn, shelf_id)
+    shelf_name = books[0].get('shelf_name')
+    return render_template('bookshelf.html', books = books, shelf_name = shelf_name)    
+
+@app.route('/book/<bid>', methods=['GET'])
+def show_book(bid):
+    conn = dbi.connect()
+    book_info = functions.get_book(conn, bid)
+    title = book_info.get('bname')
+    author = book_info.get('author')
+    genre = book_info.get('genre')
+    avg_rating = book_info.get('avg_rating')
+    return render_template('book.html', title = title, author = author,
+                            genre = genre, avg_rating = avg_rating)
 
 # Below routes are from the flask starter
 @app.route('/greet/', methods=["GET", "POST"])

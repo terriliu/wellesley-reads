@@ -20,7 +20,7 @@ create table user (
 )
 ENGINE = InnoDB;
 
-create table befriend (
+create table befriend ( -- (personA, personB) and (personB, personA) both exists but refer to the same pairing
     uid_1 int,
     uid_2 int,
     primary key (uid_1, uid_2),
