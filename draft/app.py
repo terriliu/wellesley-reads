@@ -53,10 +53,10 @@ def show_book(bid):
     conn = dbi.connect()
     book_info = functions.get_book(conn, bid)
     title = book_info.get('bname')
-    author = book_info.get('author')
+    # author = book_info.get('author') TODO: fix
     genre = book_info.get('genre')
     avg_rating = book_info.get('avg_rating')
-    return render_template('book.html', title = title, author = author,
+    return render_template('book.html', title = title,
                             genre = genre, avg_rating = avg_rating)
 
 # Below routes are from the flask starter
