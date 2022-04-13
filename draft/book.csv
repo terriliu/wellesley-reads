@@ -1,4 +1,4 @@
-bid,bname,genre,avg_rating,author
+bid,bname,genre,avg_rating,aid
 "1				",The Time Traveler's Wife,"romance,science-fiction,fiction",,1
 "2				",Murder on the Orient Express,"mystery,fiction",,2
 "3				",The Martian,"science-fiction,fiction",,3
