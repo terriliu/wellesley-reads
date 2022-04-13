@@ -5,8 +5,8 @@ drop table if exists review;
 drop table if exists rate;
 drop table if exists book_on_shelf;
 drop table if exists shelf;
-drop table if exists author;
 drop table if exists book;
+drop table if exists author;
 drop table if exists befriend;
 drop table if exists user;
 
