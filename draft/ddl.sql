@@ -103,9 +103,8 @@ ENGINE = InnoDB;
 create table review (
     `uid` int,
     bid int,
-    rid int auto_increment, -- review id
+    review_id int auto_increment, -- review id
     content varchar (400), -- TODO: longer? shorter?
-    posted_by int unsigned, -- the id of the author of the review
     post_date datetime,
     primary key (rid), -- this way a user can post multiple reviews of a single book
     foreign key (`uid`) references user (`uid`)
@@ -119,7 +118,7 @@ ENGINE = InnoDB;
 
 create table reply (
     `uid` int,
-    rid int,
+    reply_id int,
     reply_date datetime,
     primary key (`uid`, rid, reply_date),
     foreign key (`uid`) references user (`uid`)
