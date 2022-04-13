@@ -34,28 +34,30 @@ create table befriend ( -- (personA, personB) and (personB, personA) both exists
 )
 ENGINE = InnoDB;
 
-create table book (
-    bid int auto_increment, -- book id
-    bname varchar(40),
-    genre set('romance', 'mystery', 'science-fiction', 'nonfiction', 'fiction', 'horror'),
-    avg_rating float unsigned,
-    primary key (bid),
-    foreign key (aid) references author (aid)
-        on update cascade
-        on delete restrict
-    index (bname)
-)
-ENGINE = InnoDB;
-
 create table author (
     aid int auto_increment,
     author varchar(30),
     author_bio varchar(100),
     has_user_account tinyint, -- either 1 (true) or 0 (false)
     user_account_id int, -- would be NULL if has_user_account = 0
-    foreign key (user_account_id) references user (`uid`),
+    primary key (aid),
+    foreign key (user_account_id) references user (`uid`)
         on update cascade
         on delete restrict
+)
+ENGINE = InnoDB;
+
+create table book (
+    bid int auto_increment, -- book id
+    bname varchar(40),
+    genre set('romance', 'mystery', 'science-fiction', 'nonfiction', 'fiction', 'horror'),
+    avg_rating float unsigned,
+    aid int,
+    primary key (bid),
+    foreign key (aid) references author (aid)
+        on update cascade
+        on delete restrict,
+    index (bname)
 )
 ENGINE = InnoDB;
 
