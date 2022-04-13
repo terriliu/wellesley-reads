@@ -1,0 +1,21 @@
+bid,bname,genre,avg_rating,author
+"1				",The Time Traveler's Wife,"romance,science-fiction,fiction",,1
+"2				",Murder on the Orient Express,"mystery,fiction",,2
+"3				",The Martian,"science-fiction,fiction",,3
+"4				",Becoming,nonfiction,,4
+"5				",The Shining,"horror,fiction",,15
+"6				",The Fault in Our Stars,"romance,fiction",,5
+"7				",The Da Vinci Code,"mystery,fiction",,9
+"8				",1984,"science-fiction,fiction",,6
+"9				",The Diary of a Young Girl,nonfiction,,7
+"10				",Dracula,"horror,fiction",,8
+"11				",The Notebook,"romance,fiction",,11
+"12				",Angels & Demons,"mystery,fiction",,9
+"13				",The Hunger Games,"science-fiction,fiction",,10
+"14				",A Walk to Remember,"romance,fiction",,11
+"15				",The Adventure of Sherlock Holmes,"mystery,fiction",,12
+"16				","I,Robot","science-fiction,fiction",,13
+"17				",Educated,nonfiction,,14
+"18				",It,"horror,fiction",,15
+"19				",Into the Wild,nonfiction,,16
+"20				",The Exorcist,"horror,fiction",,17
