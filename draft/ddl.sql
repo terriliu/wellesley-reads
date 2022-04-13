@@ -106,7 +106,7 @@ create table review (
     review_id int auto_increment, -- review id
     content varchar (400), -- TODO: longer? shorter?
     post_date datetime,
-    primary key (rid), -- this way a user can post multiple reviews of a single book
+    primary key (review_id), -- this way a user can post multiple reviews of a single book
     foreign key (`uid`) references user (`uid`)
         on update cascade
         on delete restrict,
@@ -120,11 +120,12 @@ create table reply (
     `uid` int,
     reply_id int,
     reply_date datetime,
-    primary key (`uid`, rid, reply_date),
+    review_id int,
+    primary key (`uid`, reply_id, reply_date),
     foreign key (`uid`) references user (`uid`)
         on update cascade
         on delete restrict,
-    foreign key (rid) references review (rid)
+    foreign key (review_id) references review (review_id)
         on update cascade
         on delete restrict
 )
