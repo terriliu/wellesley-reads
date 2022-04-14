@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+<h1>Hello!</h1>
+
+<p>You are not logged in.</p>
+
+<b><a href = "{{ url_for('login') }}">click here to log in</a></b>
+
+{% endblock %}

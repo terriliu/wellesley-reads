@@ -24,7 +24,23 @@ app.config['TRAP_BAD_REQUEST_ERRORS'] = True
 
 @app.route('/')
 def index():
-    return render_template('main.html',title='Hello')
+    if 'username' in session:
+        username = session['username']
+        return render_template('main.html',title='Hello', username=username)
+    return render_template('main_not_logged_in.html')
+
+@app.route('/login', methods = ['GET', 'POST'])
+def login():
+   if request.method == 'POST':
+      session['username'] = request.form['username']
+      return redirect(url_for('index'))
+   return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+   # remove the username from the session if it is there
+   session.pop('username', None)
+   return redirect(url_for('index'))
 
 @app.route('/user/<uid>', methods=['GET'])
 def user_profile(uid):
