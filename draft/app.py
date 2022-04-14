@@ -1,3 +1,4 @@
+from uuid import UUID
 from flask import (Flask, render_template, make_response, url_for, request,
                    redirect, flash, session, send_from_directory, jsonify)
 from werkzeug.utils import secure_filename
@@ -66,16 +67,58 @@ def display_shelf(shelf_id):
 
 @app.route('/book/<bid>', methods=['GET'])
 def show_book(bid):
-    conn = dbi.connect()
-    book_info = functions.get_book(conn, bid)
+    conn1 = dbi.connect()
+    book_info = functions.get_book(conn1, bid)
     title = book_info.get('bname')
     author = book_info.get('author')
     author_id = book_info.get('aid')
     genre = book_info.get('genre')
     avg_rating = book_info.get('avg_rating')
-    return render_template('book.html', title = title,
+    conn2 = dbi.connect()
+    all_reviews = functions.get_reviews(conn2, bid)
+    username = session['username']
+    conn3 = dbi.connect()
+    sesh_uid = functions.get_user_id(conn3, username)
+    sesh_user_has_posted = False
+    sesh_user_review = None
+    for review in all_reviews:
+        if review.get('uname') == username:
+            sesh_user_has_posted = True
+            sesh_user_review = review
+    return render_template('book.html', title = title, bid = bid,
                             genre = genre, avg_rating = avg_rating,
-                            author = author, aid = author_id)
+                            author = author, aid = author_id, 
+                            sesh_user_has_posted = sesh_user_has_posted,
+                            all_reviews = all_reviews, 
+                            sesh_user_review = sesh_user_review, 
+                            sesh_uid = sesh_uid, sesh_user = username)
+
+@app.route('/review/<bid>/<uid>', methods=['GET', 'POST'])
+def post_review(bid, uid):
+    if request.method == 'GET':
+        conn = dbi.connect()
+        book_info = functions.get_book(conn, bid)
+        bname = book_info.get('bname')
+        return render_template('post_review.html', bname=bname)
+    else:
+        conn = dbi.connect()
+        functions.post_review(conn, bid, uid, request.form['rating'], request.form['content'])
+        flash('review posted!')
+        return redirect( url_for('show_book', bid=bid) )
+
+@app.route('/review/<review_id>', methods=['GET'])
+def show_review(review_id):
+    conn1 = dbi.connect()
+    review = functions.get_review(conn1, review_id)
+    book = review.get('bname')
+    uname = review.get('uname')
+    date = review.get('post_date')
+    content = review.get('content')
+    rating = review.get('rating')
+    conn2 = dbi.connect()
+    replies = functions.get_replies(conn2, review_id)
+    return render_template('review.html', book=book, uname=uname, date=date,
+                            content=content,rating=rating,replies=replies)
 
 @app.route('/author/<aid>', methods=['GET'])
 def show_author(aid):

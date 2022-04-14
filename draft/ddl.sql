@@ -49,10 +49,8 @@ create table book (
     bid int auto_increment, -- book id
     bname varchar(40),
     aid int,
-    isbn int,
     genre set('romance', 'mystery', 'science-fiction', 'nonfiction', 'fiction', 'horror'),
     avg_rating float unsigned,
-    aid int,
     primary key (bid),
     index (bname),
     foreign key (aid) references author (aid)
@@ -88,7 +86,7 @@ ENGINE = InnoDB;
 create table review (
     `uid` int,
     bid int,
-    rid int auto_increment, -- review id
+    review_id int auto_increment, -- review id
     rating enum('0', '0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5'),
     content varchar (400), -- TODO: longer? shorter?
     post_date datetime,
@@ -104,10 +102,11 @@ ENGINE = InnoDB;
 
 create table reply (
     `uid` int,
-    reply_id int,
+    reply_id int auto_increment,
     reply_date datetime,
     review_id int,
-    primary key (`uid`, reply_id, reply_date),
+    content varchar(400),
+    primary key (reply_id),
     foreign key (`uid`) references user (`uid`)
         on update cascade
         on delete restrict,
