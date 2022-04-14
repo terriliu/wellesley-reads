@@ -45,7 +45,7 @@ def logout():
 @app.route('/user/<uid>', methods=['GET'])
 def user_profile(uid):
     conn1 = dbi.connect()
-    user_info = functions.get_user_info(conn1, uid) # example of calling helper functions
+    user_info = functions.get_user_info(conn1, uid) 
     uname = user_info.get('uname')
     bio = user_info.get('bio')
     fav_genres = user_info.get('fav_genres')
