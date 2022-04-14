@@ -9,7 +9,6 @@ drop table if exists author;
 drop table if exists befriend;
 drop table if exists user;
 
-
 create table user (
     `uid` int auto_increment,
     uname varchar(10),
@@ -39,7 +38,7 @@ create table author (
     author_bio varchar(100),
     has_user_account tinyint, -- either 1 (true) or 0 (false)
     user_account_id int, -- would be NULL if has_user_account = 0
-    primary key(aid),
+    primary key (aid),
     foreign key (user_account_id) references user (`uid`)
         on update cascade
         on delete restrict
@@ -53,6 +52,7 @@ create table book (
     isbn int,
     genre set('romance', 'mystery', 'science-fiction', 'nonfiction', 'fiction', 'horror'),
     avg_rating float unsigned,
+    aid int,
     primary key (bid),
     index (bname),
     foreign key (aid) references author (aid)
@@ -92,7 +92,7 @@ create table review (
     rating enum('0', '0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5'),
     content varchar (400), -- TODO: longer? shorter?
     post_date datetime,
-    primary key (rid), -- this way a user can post multiple reviews of a single book
+    primary key (review_id), -- this way a user can post multiple reviews of a single book
     foreign key (`uid`) references user (`uid`)
         on update cascade
         on delete restrict,
@@ -104,13 +104,14 @@ ENGINE = InnoDB;
 
 create table reply (
     `uid` int,
-    rid int,
+    reply_id int,
     reply_date datetime,
-    primary key (`uid`, rid, reply_date),
+    review_id int,
+    primary key (`uid`, reply_id, reply_date),
     foreign key (`uid`) references user (`uid`)
         on update cascade
         on delete restrict,
-    foreign key (rid) references review (rid)
+    foreign key (review_id) references review (review_id)
         on update cascade
         on delete restrict
 )

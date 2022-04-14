@@ -3,6 +3,7 @@
 {% block main_content %}
 <h1>{{title}}</h1>
 <ul>
+    <li>Author: <a href="{{ url_for('show_author', aid=aid) }}">{{author}}</a></li>
     <li>Genre: {{genre}}</li>
     <li>Average rating: {{avg_rating}}</li>
 </ul>

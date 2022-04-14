@@ -60,7 +60,7 @@ def user_profile(uid):
 @app.route('/shelf/<shelf_id>', methods=['GET'])
 def display_shelf(shelf_id):
     conn = dbi.connect()
-    books = functions.get_books(conn, shelf_id)
+    books = functions.get_shelf_books(conn, shelf_id)
     shelf_name = books[0].get('shelf_name')
     return render_template('bookshelf.html', books = books, shelf_name = shelf_name)    
 
@@ -69,11 +69,23 @@ def show_book(bid):
     conn = dbi.connect()
     book_info = functions.get_book(conn, bid)
     title = book_info.get('bname')
-    # author = book_info.get('author') TODO: fix
+    author = book_info.get('author')
+    author_id = book_info.get('aid')
     genre = book_info.get('genre')
     avg_rating = book_info.get('avg_rating')
     return render_template('book.html', title = title,
-                            genre = genre, avg_rating = avg_rating)
+                            genre = genre, avg_rating = avg_rating,
+                            author = author, aid = author_id)
+
+@app.route('/author/<aid>', methods=['GET'])
+def show_author(aid):
+    conn = dbi.connect()
+    author_info = functions.get_author(conn, aid)
+    name = author_info.get('author')
+    bio = author_info.get('author_bio')
+    books = functions.get_author_books(conn, aid)
+    return render_template('author.html', name = name,
+                            bio = bio, books = books)
 
 # Below routes are from the flask starter
 @app.route('/greet/', methods=["GET", "POST"])
