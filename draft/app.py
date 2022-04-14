@@ -27,7 +27,10 @@ app.config['TRAP_BAD_REQUEST_ERRORS'] = True
 def index():
     if 'username' in session:
         username = session['username']
-        return render_template('main.html',title='Hello', username=username)
+        conn = dbi.connect()
+        uid = functions.get_user_id(conn, username)
+        return redirect(url_for('user_profile', uid=uid))
+        #return render_template('main.html',title='Hello', username=username)
     return render_template('main_not_logged_in.html')
 
 @app.route('/login', methods = ['GET', 'POST'])

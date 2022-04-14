@@ -1,6 +1,24 @@
 -- check if you are using the correct database
 use wellesleyreads_db; 
 
+-- user table
+load data local infile 'user.csv' 
+into table user 
+fields terminated by ',' 
+enclosed by "" lines 
+terminated by '\r\n' 
+ignore 1 rows 
+(uname,bio,fav_genres);
+
+-- befriend table
+load data local infile 'befriend.csv' 
+into table befriend 
+fields terminated by ',' 
+enclosed by "" lines 
+terminated by '\r\n' 
+ignore 1 rows 
+(uid_1,uid_2);
+
 --author table
 load data local infile 'author.csv' 
 into table author 
@@ -36,3 +54,12 @@ enclosed by '"' lines
 terminated by '\r\n' 
 ignore 1 rows 
 (bid,shelf_id);
+
+--review table TODO: not sure i got the csv file right..
+load data local infile 'review.csv' 
+into table review
+fields terminated by ',' 
+enclosed by '"' lines 
+terminated by '\r\n' 
+ignore 1 rows 
+(uid,bid,rating,content,post_date);
