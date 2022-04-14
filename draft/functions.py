@@ -3,11 +3,17 @@ from curses import KEY_SFIND
 from flask import (Flask, render_template, make_response, url_for, request,
 redirect, flash, session, send_from_directory, jsonify)
 from werkzeug.utils import secure_filename
+from datetime import datetime
 
 app = Flask(__name__)
 
 import cs304dbi as dbi
 
+def get_user_id(conn, username):
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''select `uid` from user
+                    where uname = %s''', username)
+    return curs.fetchone().get('uid')
 
 def get_user_info(conn, uid):
     curs = dbi.dict_cursor(conn)
@@ -55,6 +61,36 @@ def get_author_books(conn, aid):
     curs.execute('''select bid, bname from book
                     inner join author using (aid)
                     where aid=%s''', aid)
+    return curs.fetchall()
+
+def get_reviews(conn, bid):
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''select review_id, rating, content, post_date, uname, `uid` from review 
+                    inner join user using (`uid`)
+                    where bid=%s''', bid)
+    return curs.fetchall()
+
+def get_review(conn, review_id):
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''select review_id, rating, content, post_date, `uid`, uname, bname from review
+                    inner join user using (`uid`)
+                    inner join book using (bid)
+                    where review_id=%s''', review_id)
+    return curs.fetchone()
+
+def post_review(conn, bid, uid, rating, content):
+    now = datetime.now()
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''insert into review(`uid`, bid, rating, content, post_date) 
+                    values (%s, %s, %s, %s, %s)''', [uid, bid, rating, content, now])
+    conn.commit()
+    return
+
+def get_replies(conn, review_id):
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''select reply_id, content, reply_date, uname, `uid` from reply 
+                    inner join user using (`uid`)
+                    where review_id=%s''', review_id)
     return curs.fetchall()
     
 if __name__ == '__main__':
