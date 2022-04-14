@@ -29,7 +29,7 @@ def get_shelves(conn, uid):
                     where `uid`=%s''', uid)
     return curs.fetchall()
 
-def get_books(conn, shelf_id):
+def get_shelf_books(conn, shelf_id):
     curs = dbi.dict_cursor(conn)
     curs.execute('''select bid, bname, shelf_name from book
                     inner join book_on_shelf using (bid)
@@ -39,8 +39,23 @@ def get_books(conn, shelf_id):
 
 def get_book(conn, bid):
     curs = dbi.dict_cursor(conn)
-    curs.execute('''select * from book where bid=%s''', bid)
+    curs.execute('''select book.bid, book.bname, book.genre, 
+                    book.avg_rating, author.aid, author.author from book 
+                    inner join author using (aid) 
+                    where book.bid = %s''', bid)
     return curs.fetchone()
+
+def get_author(conn, aid):
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''select * from author where aid=%s''', aid)
+    return curs.fetchone()
+
+def get_author_books(conn, aid):
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''select bid, bname from book
+                    inner join author using (aid)
+                    where aid=%s''', aid)
+    return curs.fetchall()
     
 if __name__ == '__main__':
     dbi.cache_cnf()

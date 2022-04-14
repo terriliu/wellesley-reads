@@ -10,7 +10,6 @@ drop table if exists author;
 drop table if exists befriend;
 drop table if exists user;
 
-
 create table user (
     `uid` int auto_increment,
     uname varchar(10),
