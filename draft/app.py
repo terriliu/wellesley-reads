@@ -46,6 +46,40 @@ def logout():
    session.pop('username', None)
    return redirect(url_for('index'))
 
+@app.route('/query/')
+def submission_handler():
+    conn = dbi.connect()
+    # User input
+    query = request.args['query']
+    # Type of search, person/movie
+    kind = request.args['kind']
+    if kind == 'author':
+        # Gets list of every author that matches the query
+        authors = functions.get_author_list(conn, query)
+        # If there is no match, inform the user
+        if len(authors) == 0:
+            return render_template('notfound.html', item = 'author', type = 'name', frag = query)
+        # If there is one match, redirect to the appropriate page
+        elif len(authors) == 1:
+            return redirect(url_for('show_author', aid = authors[0]['aid']))
+        # If there are multiple matches, list hyperlinks to various author pages
+        elif len(authors) > 1:
+            return render_template('many_authors_found.html', frag = query, group = authors)
+
+
+    elif kind == 'book':
+        # Gets list of every book that matches the query
+        books = functions.get_book_list(conn, query)
+        # If there is no match, inform the user
+        if len(books) == 0:
+            return render_template('notfound.html', item = 'book', type = 'title', frag = query)
+        # If there is one match, redirect to the appropriate page
+        elif len(books) == 1:
+            return redirect(url_for('show_book', bid = books[0]['bid']))
+        # If there are multiple matches, list hyperlinks to various book pages
+        elif len(books) > 1:
+            return render_template('many_books_found.html', frag = query, group = books)
+
 @app.route('/user/<uid>', methods=['GET'])
 def user_profile(uid):
     conn1 = dbi.connect()

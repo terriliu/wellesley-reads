@@ -92,7 +92,21 @@ def get_replies(conn, review_id):
                     inner join user using (`uid`)
                     where review_id=%s''', review_id)
     return curs.fetchall()
-    
+
+def get_author_list(conn, name):
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''select aid, author from author 
+                    where author like %s;''',
+                    ['%' + name + '%'])
+    return curs.fetchall()
+
+def get_book_list(conn, title):
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''select bid, bname from book 
+                    where bname like %s;''',
+                    ['%' + title + '%'])
+    return curs.fetchall()
+
 if __name__ == '__main__':
     dbi.cache_cnf()
     dbi.use('wellesleyreads_db')

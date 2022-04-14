@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+    {% block main_content %}
+        <p>Books matching {{ frag }}</p>
+        <ol>
+            {% for book in group %}
+            <li><a href="{{url_for('show_book', bid=book.bid)}}">{{ book.bname }} </a></li>
+            {% endfor %}
+        </ol>
+    {% endblock %}
