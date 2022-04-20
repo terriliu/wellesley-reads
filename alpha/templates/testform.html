@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+<p>Click to <a href="{{ url_for('index') }}">return to the main page</a>.</p>
+
+<h1>Test Forms</h1>
+
+<h2>POST form</h2>
+
+<form method="post" action="{{url_for('formecho')}}">
+<p><label>Name:
+    <input required type="text" name="user" size="50" placeholder="Arthur, King of the Britons"></label></p>
+
+<p><label>Quest:
+    <textarea required name="quest" rows="3" cols="50" placeholder="To seek the grail"></textarea>
+</label></p>
+
+<p><label>Favorite Color?
+        <select required name="color">
+            <option value="">choose</option>
+            <option>Blue</option>
+            <option value="yellow">No, yel...</option>
+        </select>
+</label></p>
+
+<p><input type="submit" value="process form">
+</form>
+
+<h2>GET form</h2>
+
+<form method="get" action="{{url_for('formecho')}}">
+<p><label>Name:
+    <input required type="text" name="user" size="50" placeholder="Arthur, King of the Britons"></label></p>
+
+<p><label>Quest:
+    <textarea required name="quest" rows="3" cols="50" placeholder="To seek the grail"></textarea>
+</label></p>
+
+<p><label>Favorite Color?
+        <select required name="color">
+            <option value="">choose</option>
+            <option>Blue</option>
+            <option value="yellow">No, yel...</option>
+        </select>
+</label></p>
+
+<p><input type="submit" value="process form">
+</form>
+
+{% endblock %}

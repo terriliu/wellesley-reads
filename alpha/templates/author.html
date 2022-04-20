@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+<h1>{{name}}</h1>
+
+<p> Biography: {{bio}}
+</p>
+
+<p>Books:</p>
+<ol> 
+    {% for book in books %}
+    <li><a href="{{ url_for('show_book', bid=book.bid) }}">{{book.bname}}</a></li>
+    {% endfor %}
+</ol> 
+
+
+{% endblock %}

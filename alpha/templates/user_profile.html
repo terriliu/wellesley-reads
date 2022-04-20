@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+<h1>Hi {{name}}!</h1>
+
+<h2>About Me</h2>
+<p>{{bio}}</p>
+
+<h2>Fav Genres</h2>
+<p>{{genres}}</p>
+
+<h2>Friends</h2>
+<ul> 
+    {% for friend in friends %}
+    <li><a href="{{ url_for('.user_profile', uid=friend.get('uid')) }}">{{friend.get('uname')}}</a></li>
+    {% endfor %}
+</ul> 
+
+<h2>Bookshelves</h2>
+<ul> 
+    {% for shelf in shelves %}
+    <li><a href="{{ url_for('.display_shelf', shelf_id=shelf.get('shelf_id')) }}">{{shelf.get('shelf_name')}}</a></li>
+    {% endfor %}
+</ul> 
+{% endblock %}

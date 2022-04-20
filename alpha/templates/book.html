@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+<h1>{{title}}</h1>
+<ul>
+    <li>Author: <a href="{{ url_for('show_author', aid=aid) }}">{{author}}</a></li>
+    <li>Genre: {{genre}}</li>
+    <li>Average rating: {{avg_rating}}</li>
+</ul>
+
+<h2>Your ({{sesh_user}}) review</h2>
+{% if sesh_user_has_posted %}
+<p>Rating: {{sesh_user_review.get('rating')}}</p>
+<p>Review: {{sesh_user_review.get('content')}}</p>
+<p>Date posted: {{sesh_user_review.get('post_date')}}</p>
+{% else %}
+<p>You haven't posted a review. <a href="{{ url_for('.post_review', uid=sesh_uid, bid=bid) }}">Create a post!</a></p>
+{% endif %}
+
+<h2>Reviews</h2>
+<ul> 
+    {% for review in all_reviews %}
+    {% if review.get('uname') != sesh_user %}
+    <li>
+        <a href="{{ url_for('.user_profile', uid=review.get('uid')) }}">{{review.get('uname')}}</a> rated this book {{review.get('rating')}} 
+        and said: "{{review.get('content')}}" on {{review.get('post_date')}}
+        <a href="{{ url_for('.show_review', review_id=review.get('review_id')) }}">Click here to view replies</a>
+    </li>
+    {% endif %}
+    {% endfor %}
+</ul> 
+
+
+
+{% endblock %}
