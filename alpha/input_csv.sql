@@ -62,4 +62,4 @@ fields terminated by ','
 enclosed by '"' lines 
 terminated by '\r\n' 
 ignore 1 rows 
-(uid,bid,rating,content,post_date);
+(uid,bid,review_id, rating,content,post_date);
