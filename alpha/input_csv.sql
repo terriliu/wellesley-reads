@@ -54,11 +54,20 @@ lines terminated by '\r\n'
 ignore 1 rows 
 (bid,shelf_id);
 
---review table TODO: not sure i got the csv file right..
+--review table
 load data local infile 'review.csv' 
 into table review
 fields terminated by ',' 
 enclosed by '"' 
 lines terminated by '\r\n' 
 ignore 1 rows 
-(uid,bid,rating,content,post_date);
+(uid,bid,review_id,rating,content,post_date);
+
+--reply table
+load data local infile 'reply.csv' 
+into table reply
+fields terminated by ',' 
+enclosed by '"' lines 
+terminated by '\r\n' 
+ignore 1 rows 
+(uid,reply_id,reply_date,review_id,content);

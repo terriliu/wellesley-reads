@@ -84,6 +84,10 @@ def post_review(conn, bid, uid, rating, content):
     curs.execute('''insert into review(`uid`, bid, rating, content, post_date) 
                     values (%s, %s, %s, %s, %s)''', [uid, bid, rating, content, now])
     conn.commit()
+    curs.execute('''select avg(rating) as avg from review where bid=%s;''', [bid])
+    avg = round(curs.fetchone().get('avg'),1)
+    curs.execute('''update book set avg_rating = %s where bid = %s''', [avg, bid])
+    conn.commit()
     return
 
 def get_replies(conn, review_id):
