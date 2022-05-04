@@ -2,20 +2,19 @@
 use wellesleyreads_db; 
 
 -- user table
-load data local infile 'user.csv' 
+load data local infile 'user.tsv' 
 into table user 
-fields terminated by ',' 
-enclosed by "" lines 
-terminated by '\r\n' 
+fields terminated by '\t'
+lines terminated by '\n' 
 ignore 1 rows 
-(uname,bio,fav_genres);
+(uname,bio,fav_genres,hashed);
 
 -- befriend table
 load data local infile 'befriend.csv' 
 into table befriend 
 fields terminated by ',' 
-enclosed by "" lines 
-terminated by '\r\n' 
+enclosed by "" 
+lines terminated by '\r\n' 
 ignore 1 rows 
 (uid_1,uid_2);
 
@@ -23,8 +22,8 @@ ignore 1 rows
 load data local infile 'author.csv' 
 into table author 
 fields terminated by ',' 
-enclosed by '"' lines 
-terminated by '\r\n' 
+enclosed by '"' 
+lines terminated by '\r\n' 
 ignore 1 rows 
 (aid,author,author_bio,has_user_account,user_account_id);
 
@@ -41,8 +40,8 @@ ignore 1 rows
 load data local infile 'shelf.csv' 
 into table shelf 
 fields terminated by ',' 
-enclosed by '"' lines 
-terminated by '\r\n' 
+enclosed by '"' 
+lines terminated by '\r\n' 
 ignore 1 rows 
 (uid,shelf_name);
 
@@ -50,8 +49,8 @@ ignore 1 rows
 load data local infile 'book_on_shelf.csv' 
 into table book_on_shelf 
 fields terminated by ',' 
-enclosed by '"' lines 
-terminated by '\r\n' 
+enclosed by '"' 
+lines terminated by '\r\n' 
 ignore 1 rows 
 (bid,shelf_id);
 
@@ -59,8 +58,8 @@ ignore 1 rows
 load data local infile 'review.csv' 
 into table review
 fields terminated by ',' 
-enclosed by '"' lines 
-terminated by '\r\n' 
+enclosed by '"' 
+lines terminated by '\r\n' 
 ignore 1 rows 
 (uid,bid,review_id,rating,content,post_date);
 

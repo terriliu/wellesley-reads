@@ -1,9 +1,17 @@
 {% extends "base.html" %}
 
 {% block main_content %}
-<h1>Hi {{name}}!</h1>
 
+{% if uid == session['uid'] %}
+<h1>Hi {{name}}!</h1>
+<p>edit profile</p>
 <h2>About Me</h2>
+
+{% else %}
+<h1>{{name}}'s profile</h1>
+<h2>About</h2>
+{% endif %}
+
 <p>{{bio}}</p>
 
 <h2>Fav Genres</h2>
@@ -12,7 +20,7 @@
 <h2>Friends</h2>
 <ul> 
     {% for friend in friends %}
-    <li><a href="{{ url_for('.user_profile', uid=friend.get('uid')) }}">{{friend.get('uname')}}</a></li>
+    <li><a href="{{ url_for('user_profile', uid=friend.get('uid')) }}">{{friend.get('uname')}}</a></li>
     {% endfor %}
 </ul> 
 
@@ -22,4 +30,5 @@
     <li><a href="{{ url_for('.display_shelf', shelf_id=shelf.get('shelf_id')) }}">{{shelf.get('shelf_name')}}</a></li>
     {% endfor %}
 </ul> 
+
 {% endblock %}
