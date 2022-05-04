@@ -87,7 +87,6 @@ create table review (
     `uid` int,
     bid int,
     review_id int auto_increment, -- review id
-    -- rating enum('0', '0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5'),
     rating float unsigned,
     content varchar (400), -- TODO: longer? shorter?
     post_date datetime,

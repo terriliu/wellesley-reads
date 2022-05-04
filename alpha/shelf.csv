@@ -1,25 +1,55 @@
 ﻿uid,shelf_name
-1,Romance
+1,Read
 1,Want to read
-2,Interested
+1,Romance
+2,Read
+2,Want to read
+3,Read
 3,Want to read
+4,Read
+4,Want to read
 4,Mystery
-5,Book List
-5,romance
-7,recommended
-8,family
-9,book club
-10,book club
+5,Read
+5,Want to read
+5,Romance
+6,Read
+6,Want to read
+7,Read
+7,Want to read
+8,Read
+8,Want to read
+8,Family
+9,Read
+9,Want to read
+9,Book club
+10,Read
+10,Want to read
+10,Book club
 10,Romance
-11,want to read
+11,Read
+11,Want to read
+12,Read
+12,Want to read
 12,March Reading List
-13,Interested
+13,Read
+13,Want to read
+14,Read
+14,Want to read
 14,Non-Fiction
-15,Nicholas Sparks
-16,Fiction
+15,Read
+15,Want to read
+16,Read
 16,Want to Read
-17,Interested
+16,Fiction
+17,Read
+17,Want to read
+18,Read
+18,Want to read
 18,Family List
+19,Read
+19,Want to read
 19,Book Club Wellesley
+20,Read
+20,Want to read
 20,Book Club December
 20,2022 Reading List

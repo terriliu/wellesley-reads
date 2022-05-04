@@ -8,6 +8,19 @@
     <li>Average rating: {{avg_rating}}</li>
 </ul>
 
+<form method='post' action="{{url_for('add_to_shelf', bid = bid)}}">
+    <p>
+        <label>Add to bookshelf:
+            <select name="shelf_name">
+                {% for shelf in shelves %}
+                <option value={{shelf.shelf_name}}>{{shelf.shelf_name}}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <input type="submit" value="submit">
+    </p>
+</form>
+
 <h2>Your ({{sesh_user}}) review</h2>
 {% if sesh_user_has_posted %}
 <p>Rating: {{sesh_user_review.get('rating')}}</p>

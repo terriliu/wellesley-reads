@@ -49,9 +49,7 @@ def logout():
 @app.route('/query/')
 def submission_handler():
     conn = dbi.connect()
-    # User input
     query = request.args['query']
-    # Type of search, person/movie
     kind = request.args['kind']
     if kind == 'author':
         # Gets list of every author that matches the query
@@ -66,7 +64,6 @@ def submission_handler():
         elif len(authors) > 1:
             return render_template('many_authors_found.html', frag = query, group = authors)
 
-
     elif kind == 'book':
         # Gets list of every book that matches the query
         books = functions.get_book_list(conn, query)
@@ -79,6 +76,19 @@ def submission_handler():
         # If there are multiple matches, list hyperlinks to various book pages
         elif len(books) > 1:
             return render_template('many_books_found.html', frag = query, group = books)
+    
+    elif kind == 'user':
+        # Gets list of every user that matches the query
+        users = functions.get_user_list(conn, query)
+        # If there is no match, inform the user
+        if len(users) == 0:
+            return render_template('notfound.html', item = 'user', type = 'name', frag = query)
+        # If there is one match, redirect to the appropriate page
+        elif len(users) == 1:
+            return redirect(url_for('user_profile', uid = users[0]['uid']))
+        # If there are multiple matches, list hyperlinks to various user pages
+        elif len(users) > 1:
+            return render_template('many_users_found.html', frag = query, group = users)
 
 @app.route('/user/<uid>', methods=['GET'])
 def user_profile(uid):
@@ -122,11 +132,12 @@ def show_book(bid):
         if review.get('uname') == username:
             sesh_user_has_posted = True
             sesh_user_review = review
+    shelves = functions.get_shelves(conn3, sesh_uid)
     return render_template('book.html', title = title, bid = bid,
                             genre = genre, avg_rating = avg_rating,
                             author = author, aid = author_id, 
                             sesh_user_has_posted = sesh_user_has_posted,
-                            all_reviews = all_reviews, 
+                            all_reviews = all_reviews, shelves = shelves,
                             sesh_user_review = sesh_user_review, 
                             sesh_uid = sesh_uid, sesh_user = username)
 
@@ -166,6 +177,31 @@ def show_author(aid):
     books = functions.get_author_books(conn, aid)
     return render_template('author.html', name = name,
                             bio = bio, books = books)
+
+@app.route('/shelf/<bid>', methods = ['POST'])
+def add_to_shelf(bid):
+    conn = dbi.connect()
+    username = session['username']
+    sesh_uid = functions.get_user_id(conn, username)
+    shelf_name = request.form['shelf_name']
+    if shelf_name == 'Want':
+        shelf_name = 'Want to read'
+    print('shelf name from the form is {}'.format(shelf_name))
+    check = functions.is_book_on_shelf(conn, 'Want to read', bid, sesh_uid)
+    check2 = functions.is_book_on_shelf(conn, 'Read', bid, sesh_uid)
+    #if shelf_name is read and book is on want to read, delete from want to read
+    if (shelf_name == 'Read') and (check != None):
+        functions.delete_book(conn, 'Want to read', bid, sesh_uid)
+        functions.add_to_shelf(conn, shelf_name, bid, sesh_uid)
+        flash('Added to your ' + str(shelf_name) + ' bookshelf')
+    #if shelf_name is want to read and book is on read, do nothing (do not add to want to read)
+    elif (shelf_name == 'Want to read') and (check2 != None):
+        flash('You already read this book!')
+    else:
+        functions.add_to_shelf(conn, shelf_name, bid, sesh_uid)
+        flash('Added to your ' + str(shelf_name) + ' bookshelf')
+    return redirect(url_for('show_book', bid = bid))
+
 
 # Below routes are from the flask starter
 @app.route('/greet/', methods=["GET", "POST"])

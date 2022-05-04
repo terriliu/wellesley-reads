@@ -30,9 +30,7 @@ def get_friends(conn, uid):
 
 def get_shelves(conn, uid):
     curs = dbi.dict_cursor(conn)
-    curs.execute('''select shelf_id, shelf_name from shelf
-                    inner join user using (`uid`)
-                    where `uid`=%s''', uid)
+    curs.execute('''select shelf_id, shelf_name from shelf where `uid`=%s''', uid)
     return curs.fetchall()
 
 def get_shelf_books(conn, shelf_id):
@@ -97,6 +95,34 @@ def get_replies(conn, review_id):
                     where review_id=%s''', review_id)
     return curs.fetchall()
 
+def get_shelves(conn, uid):
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''select shelf_id, shelf_name from shelf where `uid` = %s''', [uid])
+    return curs.fetchall()
+
+def add_to_shelf(conn, shelf_name, bid,uid):
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''select shelf_id from shelf where shelf_name = %s and `uid` = %s''', [shelf_name, uid])
+    shelf_id = curs.fetchone().get('shelf_id')
+    sql = ('''INSERT INTO book_on_shelf (bid, shelf_id) 
+            VALUES (%s, %s) ON DUPLICATE KEY UPDATE bid=%s;''')
+    curs.execute(sql, [bid, shelf_id, bid])
+    conn.commit()
+
+def is_book_on_shelf(conn, shelf_to_check, bid, uid):
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''select shelf_id from shelf where shelf_name = %s and `uid` = %s''', [shelf_to_check, uid])
+    shelf_id = curs.fetchone().get('shelf_id')
+    curs.execute('''select bid from book_on_shelf where shelf_id = %s''', [shelf_id])
+    return curs.fetchone()
+
+def delete_book(conn, shelf_name, bid, uid):
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''select shelf_id from shelf where shelf_name = %s and `uid` = %s''', [shelf_name, uid])
+    shelf_id = curs.fetchone().get('shelf_id')
+    curs.execute('''delete from book_on_shelf where shelf_id = %s and bid=%s''', [shelf_id, bid])
+    conn.commit()
+
 def get_author_list(conn, name):
     curs = dbi.dict_cursor(conn)
     curs.execute('''select aid, author from author 
@@ -110,6 +136,14 @@ def get_book_list(conn, title):
                     where bname like %s;''',
                     ['%' + title + '%'])
     return curs.fetchall()
+
+def get_user_list(conn, uname):
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''select `uid`, uname from user 
+                    where uname like %s;''',
+                    ['%' + uname + '%'])
+    return curs.fetchall()
+
 
 if __name__ == '__main__':
     dbi.cache_cnf()

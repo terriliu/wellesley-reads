@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+    {% block main_content %}
+        <p>Users matching {{ frag }}</p>
+        <ol>
+            {% for user in group %}
+            <li><a href="{{url_for('user_profile', uid=user.uid)}}">{{ user.uname }} </a></li>
+            {% endfor %}
+        </ol>
+    {% endblock %}
