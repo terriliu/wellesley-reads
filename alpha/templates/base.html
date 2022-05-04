@@ -24,9 +24,7 @@
 {% block nav %}
 <nav>
   <ul>
-    <li><a href="{{url_for('index')}}">home</a></li>
-    <!-- <li><a href="{{url_for('greet')}}">greet</a></li> -->
-    <!-- <li><a href="{{url_for('testform')}}">testform</a></li> -->
+    <li><a href="{{url_for('user_profile', uid=session['uid'])}}">my profile</a></li>
     <li><a href="{{url_for('logout')}}">logout</a></li>
   </ul>
 </nav>

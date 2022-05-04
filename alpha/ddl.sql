@@ -8,13 +8,17 @@ drop table if exists book;
 drop table if exists author;
 drop table if exists befriend;
 drop table if exists user;
+drop table if exists userpass;
+
 
 create table user (
     `uid` int auto_increment,
-    uname varchar(10),
+    uname varchar(50) not null,
+    hashed char(60),
     bio varchar(100),
     fav_genres set('romance', 'mystery', 'science-fiction', 'nonfiction', 'fiction', 'horror'), -- TODO: add more genres
     primary key (`uid`),
+    unique(uname),
     index (uname)
 )
 ENGINE = InnoDB;
@@ -87,7 +91,7 @@ create table review (
     `uid` int,
     bid int,
     review_id int auto_increment, -- review id
-    rating enum('0', '0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5'),
+    rating float unsigned,
     content varchar (400), -- TODO: longer? shorter?
     post_date datetime,
     primary key (review_id), -- this way a user can post multiple reviews of a single book

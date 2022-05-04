@@ -2,6 +2,7 @@ from uuid import UUID
 from flask import (Flask, render_template, make_response, url_for, request,
                    redirect, flash, session, send_from_directory, jsonify)
 from werkzeug.utils import secure_filename
+import bcrypt
 import functions # helper functions
 app = Flask(__name__)
 
@@ -25,26 +26,93 @@ app.config['TRAP_BAD_REQUEST_ERRORS'] = True
 
 @app.route('/')
 def index():
-    if 'username' in session:
-        username = session['username']
-        conn = dbi.connect()
-        uid = functions.get_user_id(conn, username)
-        return redirect(url_for('user_profile', uid=uid))
-        #return render_template('main.html',title='Hello', username=username)
     return render_template('main_not_logged_in.html')
 
-@app.route('/login', methods = ['GET', 'POST'])
-def login():
-   if request.method == 'POST':
-      session['username'] = request.form['username']
-      return redirect(url_for('index'))
-   return render_template('login.html')
+@app.route('/join/', methods=["GET", "POST"])
+def join():
+    if request.method == 'GET':
+        return render_template('create_user.html')
+    else:
+        username = request.form.get('username')
+        passwd1 = request.form.get('password1')
+        passwd2 = request.form.get('password2')
+        if passwd1 != passwd2:
+            flash('passwords do not match')
+            return redirect( url_for('index'))
+        hashed = bcrypt.hashpw(passwd1.encode('utf-8'),
+                            bcrypt.gensalt())
+        stored = hashed.decode('utf-8')
+        print(passwd1, type(passwd1), hashed, stored)
+        conn = dbi.connect()
+        curs = dbi.cursor(conn)
+        try:
+            curs.execute('''INSERT INTO user(`uid`,uname,hashed)
+                            VALUES(null,%s,%s)''',
+                        [username, stored])
+            conn.commit()
+        except Exception as err:
+            flash('That username is taken: {}'.format(repr(err)))
+            return redirect(url_for('index'))
+        curs.execute('select last_insert_id()')
+        row = curs.fetchone()
+        uid = row[0]
+        flash('FYI, you were issued UID {}'.format(uid))
+        session['username'] = username
+        session['uid'] = uid
+        session['logged_in'] = True
+        session['visits'] = 1
+        return redirect( url_for('user_profile', uid=uid) )
 
-@app.route('/logout')
+@app.route('/login/', methods=['GET', 'POST'])
+def login():
+    if request.method == 'GET':
+        return render_template('login.html')
+    else:
+        username = request.form.get('username')
+        passwd = request.form.get('password')
+        conn = dbi.connect()
+        curs = dbi.dict_cursor(conn)
+        curs.execute('''SELECT `uid`,hashed
+                        FROM user
+                        WHERE uname = %s''',
+                    [username])
+        row = curs.fetchone()
+        if row is None:
+            # Same response as wrong password,
+            # so no information about what went wrong
+            flash('login incorrect. Try again or join')
+            return redirect( url_for('index'))
+        stored = row['hashed']
+        print('database has stored: {} {}'.format(stored,type(stored)))
+        print('form supplied passwd: {} {}'.format(passwd,type(passwd)))
+        hashed2 = bcrypt.hashpw(passwd.encode('utf-8'),
+                                stored.encode('utf-8'))
+        hashed2_str = hashed2.decode('utf-8')
+        print('rehash is: {} {}'.format(hashed2_str,type(hashed2_str)))
+        if hashed2_str == stored:
+            print('they match!')
+            flash('successfully logged in as '+username)
+            session['username'] = username
+            session['uid'] = row['uid']
+            session['logged_in'] = True
+            session['visits'] = 1
+            return redirect( url_for('user_profile', uid=session['uid']) )
+        else:
+            flash('login incorrect. Try again or join')
+            return redirect( url_for('index'))
+
+@app.route('/logout/')
 def logout():
-   # remove the username from the session if it is there
-   session.pop('username', None)
-   return redirect(url_for('index'))
+    if 'username' in session:
+        username = session['username']
+        session.pop('username')
+        session.pop('uid')
+        session.pop('logged_in')
+        flash('You are logged out')
+        return redirect(url_for('index'))
+    else:
+        flash('you are not logged in. Please login or join')
+        return redirect( url_for('index') )
 
 @app.route('/query/')
 def submission_handler():
@@ -66,7 +134,6 @@ def submission_handler():
         elif len(authors) > 1:
             return render_template('many_authors_found.html', frag = query, group = authors)
 
-
     elif kind == 'book':
         # Gets list of every book that matches the query
         books = functions.get_book_list(conn, query)
@@ -82,18 +149,17 @@ def submission_handler():
 
 @app.route('/user/<uid>', methods=['GET'])
 def user_profile(uid):
-    conn1 = dbi.connect()
-    user_info = functions.get_user_info(conn1, uid) 
+    conn = dbi.connect()
+    user_info = functions.get_user_info(conn, uid) 
     uname = user_info.get('uname')
     bio = user_info.get('bio')
     fav_genres = user_info.get('fav_genres')
-    conn2 = dbi.connect()
-    friends = functions.get_friends(conn2, uid)
-    conn3 = dbi.connect()
-    shelves = functions.get_shelves(conn3, uid)
-    return render_template('user_profile.html', name = uname, bio = bio, 
+    friends = functions.get_friends(conn, uid)
+    shelves = functions.get_shelves(conn, uid)
+    uid = int(uid) # cast to int since uid is initially coming from the url and is a string
+    return render_template('user_profile.html', uid = uid, name = uname, bio = bio, 
                             genres = fav_genres, friends = friends,
-                            shelves = shelves)
+                            shelves = shelves, session = session)
 
 @app.route('/shelf/<shelf_id>', methods=['GET'])
 def display_shelf(shelf_id):
