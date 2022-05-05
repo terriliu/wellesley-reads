@@ -36,6 +36,17 @@ def join():
         username = request.form.get('username')
         passwd1 = request.form.get('password1')
         passwd2 = request.form.get('password2')
+        about = request.form.get('about')
+        romance = request.form.get('romance')
+        mystery = request.form.get('mystery')
+        scifi = request.form.get('science-fiction')
+        nonfiction = request.form.get('nonfiction')
+        fiction = request.form.get('fiction')
+        horror = request.form.get('horror')
+        fav_genres = ""
+        for genre in [romance, mystery, scifi, nonfiction, fiction, horror]:
+            if genre:
+                fav_genres = fav_genres + "," + genre
         if passwd1 != passwd2:
             flash('passwords do not match')
             return redirect( url_for('index'))
@@ -46,9 +57,9 @@ def join():
         conn = dbi.connect()
         curs = dbi.cursor(conn)
         try:
-            curs.execute('''INSERT INTO user(`uid`,uname,hashed)
-                            VALUES(null,%s,%s)''',
-                        [username, stored])
+            curs.execute('''INSERT INTO user(`uid`,uname,hashed,bio,fav_genres)
+                            VALUES(null,%s,%s,%s,%s)''',
+                        [username, stored, about, fav_genres])
             conn.commit()
         except Exception as err:
             flash('That username is taken: {}'.format(repr(err)))
