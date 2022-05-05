@@ -231,9 +231,36 @@ def show_review(review_id):
     content = review.get('content')
     rating = review.get('rating')
     conn2 = dbi.connect()
-    replies = functions.get_replies(conn2, review_id)
+    all_replies = functions.get_replies(conn2, review_id)
+    username = session['username']
+    conn3 = dbi.connect()
+    sesh_uid = functions.get_user_id(conn3, username)
+    sesh_user_has_replied = False
+    sesh_user_reply = None
+    for reply in all_replies:
+        if reply.get('uname') == username:
+            sesh_user_has_replied = True
+            sesh_user_reply = reply
     return render_template('review.html', book=book, uname=uname, date=date,
-                            content=content,rating=rating,replies=replies)
+                            review_id=review_id,content=content,rating=rating,
+                            all_replies=all_replies,
+                            sesh_user_has_replied=sesh_user_has_replied,
+                            sesh_user_reply=sesh_user_reply,
+                            sesh_uid=sesh_uid, sesh_user=username
+                            )
+
+@app.route('/reply/<review_id>/<uid>', methods=['GET', 'POST'])
+def post_reply(review_id,uid):
+    if request.method == 'GET':
+        conn = dbi.connect()
+        review_info = functions.get_review(conn, review_id)
+        review_id = review_info.get('review_id')
+        return render_template('post_reply.html', review_id=review_id)
+    else:
+        conn = dbi.connect()
+        functions.post_reply(conn, uid, review_id, request.form['content'])
+        flash('replied!')
+        return redirect( url_for('show_review', review_id=review_id))
 
 @app.route('/author/<aid>', methods=['GET'])
 def show_author(aid):

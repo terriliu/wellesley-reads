@@ -6,13 +6,26 @@
     {{content}} (posted on {{date}})
 </p>
 
-<h2>Replies to above review:</h2>
+<h2>Your ({{sesh_user}}) reply</h2>
+{% if sesh_user_has_replied %}
+<p>Reply: {{sesh_user_reply.get('content')}}</p>
+<p>Date replied: {{sesh_user_reply.get('reply_date')}}</p>
+{% else %}
+<p>You haven't posted a reply. <a href="{{ url_for('.post_reply', uid=sesh_uid, review_id=review_id) }}">Reply to this review!</a></p>
+{% endif %}
+
+
+<h2>All replies to above review:</h2>
 <ul> 
-    {% for reply in replies %}
+    {% for reply in all_replies %}
+    {% if reply.get('uname') != sesh_user %}
     <li>
         <a href="{{ url_for('.user_profile', uid=reply.get('uid')) }}">{{reply.get('uname')}}</a>: "{{reply.get('content')}}" (posted on {{reply.get('reply_date')}})
     </li>
+    {% endif %}
     {% endfor %}
 </ul> 
+
+
 
 {% endblock %}

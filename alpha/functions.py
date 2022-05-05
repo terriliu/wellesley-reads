@@ -95,6 +95,22 @@ def get_replies(conn, review_id):
                     where review_id=%s''', review_id)
     return curs.fetchall()
 
+def get_reply(conn, reply_id):
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''select reply_id, content, reply_date, uname, `uid` from reply 
+                    inner join user using (`uid`)
+                    inner join review using (review_id)
+                    where review_id=%s''', reply_id)
+    return curs.fetchone()
+
+def post_reply(conn, uid, review_id, content):
+    now = datetime.now()
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''insert into reply(`uid`, reply_date, review_id, content) 
+                    values (%s, %s, %s, %s)''', [uid, now, review_id, content])
+    conn.commit()
+    return
+
 def get_shelves(conn, uid):
     curs = dbi.dict_cursor(conn)
     curs.execute('''select shelf_id, shelf_name from shelf where `uid` = %s''', [uid])
