@@ -253,7 +253,6 @@ def add_to_shelf(bid):
     shelf_name = request.form['shelf_name']
     if shelf_name == 'Want':
         shelf_name = 'Want to read'
-    print('shelf name from the form is {}'.format(shelf_name))
     check = functions.is_book_on_shelf(conn, 'Want to read', bid, sesh_uid)
     check2 = functions.is_book_on_shelf(conn, 'Read', bid, sesh_uid)
     #if shelf_name is read and book is on want to read, delete from want to read
