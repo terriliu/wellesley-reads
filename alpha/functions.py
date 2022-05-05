@@ -113,7 +113,7 @@ def is_book_on_shelf(conn, shelf_to_check, bid, uid):
     curs = dbi.dict_cursor(conn)
     curs.execute('''select shelf_id from shelf where shelf_name = %s and `uid` = %s''', [shelf_to_check, uid])
     shelf_id = curs.fetchone().get('shelf_id')
-    curs.execute('''select bid from book_on_shelf where shelf_id = %s''', [shelf_id])
+    curs.execute('''select * from book_on_shelf where shelf_id = %s and bid = %s''', [shelf_id, bid])
     return curs.fetchone()
 
 def delete_book(conn, shelf_name, bid, uid):
