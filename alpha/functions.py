@@ -43,6 +43,10 @@ def get_shelf_books(conn, shelf_id):
 
 def get_book(conn, bid):
     curs = dbi.dict_cursor(conn)
+    curs.execute('''select avg(rating) as avg from review where bid=%s;''', [bid])
+    avg = round(curs.fetchone().get('avg'),1)
+    curs.execute('''update book set avg_rating = %s where bid = %s''', [avg, bid])
+    conn.commit()
     curs.execute('''select book.bid, book.bname, book.genre, 
                     book.avg_rating, author.aid, author.author from book 
                     inner join author using (aid) 
