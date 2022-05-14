@@ -68,6 +68,11 @@ def join():
         row = curs.fetchone()
         uid = row[0]
         flash('FYI, you were issued UID {}'.format(uid))
+        #auto-add 'Read' and 'Want to Read' bookshelves for new user
+        curs.execute('''INSERT INTO shelf(`uid`, shelf_name) VALUES(%s, %s)''', [uid, 'Read'])
+        conn.commit()
+        curs.execute('''INSERT INTO shelf(`uid`, shelf_name) VALUES(%s, %s)''', [uid, 'Want to Read'])
+        conn.commit()
         session['username'] = username
         session['uid'] = uid
         session['logged_in'] = True
@@ -187,8 +192,15 @@ def user_profile(uid):
 def display_shelf(shelf_id):
     conn = dbi.connect()
     books = functions.get_shelf_books(conn, shelf_id)
-    shelf_name = books[0].get('shelf_name')
-    return render_template('bookshelf.html', books = books, shelf_name = shelf_name)    
+    if len(books) != 0:
+        shelf_name = books[0].get('shelf_name')
+        return render_template('bookshelf.html', books = books, shelf_name = shelf_name)    
+    else:
+        curs = dbi.dict_cursor(conn)
+        curs.execute('''select shelf_name from shelf where shelf_id = %s''', [shelf_id])
+        shelf_name = curs.fetchone().get('shelf_name')
+        return render_template('empty_bookshelf.html', shelf_name = shelf_name)
+
 
 @app.route('/book/<bid>', methods=['GET'])
 def show_book(bid):
