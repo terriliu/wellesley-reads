@@ -312,7 +312,7 @@ def post_reply(review_id,uid):
         conn = dbi.connect()
         functions.post_reply(conn, uid, review_id, request.form['content'])
         flash('replied!')
-        return redirect( url_for('show_review', review_id=review_id))
+        return redirect(url_for('show_review', review_id=review_id))
 
 @app.route('/author/<aid>', methods=['GET'])
 def show_author(aid):
