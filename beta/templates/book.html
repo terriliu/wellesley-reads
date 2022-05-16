@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
 {% block main_content %}
-<h1>{{book['title']}}</h1>
+<h1>{{title}}</h1>
 <ul>
-    <li>Author: <a href="{{ url_for('show_author', aid=book['aid']) }}">{{book['author']}}</a></li>
-    <li>Genre: {{book['genre']}}</li>
-    <li>Average rating: {{book['avg_rating']}}</li>
+    <li>Author: <a href="{{ url_for('show_author', aid=aid) }}">{{author}}</a></li>
+    <li>Genre: {{genre}}</li>
+    <li>Average rating: {{avg_rating}}</li>
 </ul>
 
 <form method='post' action="{{url_for('add_to_shelf', bid = bid)}}">
@@ -21,15 +21,19 @@
     </p>
 </form>
 
+
+<div class="book-review">
 <h2>Your ({{sesh_user}}) review</h2>
 {% if sesh_user_has_posted %}
 <p>Rating: {{sesh_user_review.get('rating')}}</p>
 <p>Review: {{sesh_user_review.get('content')}}</p>
 <p>Date posted: {{sesh_user_review.get('post_date')}}</p>
+</div>
 {% else %}
 <p>You haven't posted a review. <a href="{{ url_for('.post_review', uid=sesh_uid, bid=bid) }}">Create a post!</a></p>
 {% endif %}
 
+<div class="other-review">
 <h2>Reviews</h2>
 <ul> 
     {% for review in all_reviews %}
@@ -42,6 +46,7 @@
     {% endif %}
     {% endfor %}
 </ul> 
+</div>
 
 
 

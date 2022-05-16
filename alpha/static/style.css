@@ -37,6 +37,26 @@ li {
     font-size:130%;
 }
 
+.book-review {
+    width: 500px;
+    border: 1px solid blue;
+    border-radius: 30px;
+    box-sizing: inherit;
+    padding:10px
+}
+.book-review + .book-review {
+    margin-bottom: 10px;
+}
+
+.other-review {
+    width: 1130px;
+    border: 1px solid blue;
+    border-radius: 30px;
+    box-sizing: inherit;
+    padding:10px
+}
+
+
 /* for a simple navbar. Talk to Scott if you want drop-downs. */
 nav > ul {
     display: flex;
