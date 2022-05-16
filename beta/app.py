@@ -37,46 +37,48 @@ def join():
         passwd1 = request.form.get('password1')
         passwd2 = request.form.get('password2')
         about = request.form.get('about')
-        romance = request.form.get('romance')
-        mystery = request.form.get('mystery')
-        scifi = request.form.get('science-fiction')
-        nonfiction = request.form.get('nonfiction')
-        fiction = request.form.get('fiction')
-        horror = request.form.get('horror')
+        genres = request.form.getlist('genre')
+        f = request.files['pic']
+        user_filename = f.filename
+        ext = user_filename.split('.')[-1]
         fav_genres = ""
-        for genre in [romance, mystery, scifi, nonfiction, fiction, horror]:
-            if genre:
-                fav_genres = fav_genres + "," + genre
+        for genre in genres:
+            fav_genres = fav_genres + "," + genre
         if passwd1 != passwd2:
             flash('passwords do not match')
             return redirect( url_for('index'))
         hashed = bcrypt.hashpw(passwd1.encode('utf-8'),
                             bcrypt.gensalt())
         stored = hashed.decode('utf-8')
-        print(passwd1, type(passwd1), hashed, stored)
-        conn = dbi.connect()
-        curs = dbi.cursor(conn)
         try:
+            conn = dbi.connect()
+            curs = dbi.dict_cursor(conn)
             curs.execute('''INSERT INTO user(`uid`,uname,hashed,bio,fav_genres)
                             VALUES(null,%s,%s,%s,%s)''',
                         [username, stored, about, fav_genres])
             conn.commit()
+            curs.execute('select last_insert_id()')
+            row = curs.fetchone()
+            print("row is", row)
+            uid = row['last_insert_id()']
+            filename = secure_filename('{}.{}'.format(uid,ext))
+            pathname = os.path.join(app.config['UPLOADS'],filename)
+            f.save(pathname)
+            curs.execute('''INSERT INTO picfile(`uid`,filename) 
+                        VALUES (%s,%s)
+                        ON DUPLICATE KEY UPDATE filename = %s''',
+                        [uid, filename, filename])
+            conn.commit()
         except Exception as err:
-            flash('That username is taken: {}'.format(repr(err)))
+            flash('There was an error: {}'.format(repr(err)))
             return redirect(url_for('index'))
-        curs.execute('select last_insert_id()')
-        row = curs.fetchone()
-        uid = row[0]
         flash('FYI, you were issued UID {}'.format(uid))
-        #auto-add 'Read' and 'Want to Read' bookshelves for new user
-        curs.execute('''INSERT INTO shelf(`uid`, shelf_name) VALUES(%s, %s)''', [uid, 'Read'])
-        conn.commit()
-        curs.execute('''INSERT INTO shelf(`uid`, shelf_name) VALUES(%s, %s)''', [uid, 'Want to Read'])
-        conn.commit()
         session['username'] = username
         session['uid'] = uid
         session['logged_in'] = True
-        session['visits'] = 1
+        numrows = curs.execute('''select filename from picfile where `uid` = %s''',
+                            [uid])
+        row = curs.fetchone()
         return redirect( url_for('user_profile', uid=uid) )
 
 @app.route('/login/', methods=['GET', 'POST'])
@@ -328,7 +330,7 @@ def post_reply(review_id,uid):
         conn = dbi.connect()
         review_info = functions.get_review(conn, review_id)
         review_id = review_info.get('review_id')
-        return render_template('post_reply.html', review_id=review_id)
+        return render_template('post_reply.html', review_id=review_id,uid=uid)
     else:
         conn = dbi.connect()
         functions.post_reply(conn, uid, review_id, request.form['content'])
