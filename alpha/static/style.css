@@ -42,20 +42,26 @@ li {
     border: 1px solid blue;
     border-radius: 30px;
     box-sizing: inherit;
-    padding:10px
-}
-.book-review + .book-review {
-    margin-bottom: 10px;
+    padding:10px;
+    margin-bottom:50px
 }
 
 .other-review {
-    width: 1130px;
     border: 1px solid blue;
     border-radius: 30px;
     box-sizing: inherit;
-    padding:10px
+    padding:10px;
+    margin-top:50px
 }
 
+.current-review {
+    width: 800px;
+    border: 1px solid blue;
+    border-radius: 30px;
+    box-sizing: inherit;
+    padding:10px;
+    margin-bottom:30px
+}
 
 /* for a simple navbar. Talk to Scott if you want drop-downs. */
 nav > ul {

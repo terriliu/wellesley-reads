@@ -50,6 +50,11 @@ def get_book(conn, bid):
                     where book.bid = %s''', bid)
     return curs.fetchone()
 
+def get_all_books(conn):
+    curs = dbi.dict_cursor(conn)
+    curs.execute('''select bid, bname from book''')
+    return curs.fetchall()
+
 def get_author(conn, aid):
     curs = dbi.dict_cursor(conn)
     curs.execute('''select * from author where aid=%s''', aid)

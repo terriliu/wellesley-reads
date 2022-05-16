@@ -243,6 +243,14 @@ def display_shelf(shelf_id):
     shelf_name = books[0].get('shelf_name')
     return render_template('bookshelf.html', books = books, shelf_name = shelf_name)    
 
+@app.route('/all-books', methods=['GET'])
+def all_books():
+    conn = dbi.connect()
+    books = functions.get_all_books(conn)
+    bid = books[0]
+    return render_template('all_books.html',bid=bid,books=books)
+
+
 @app.route('/book/<bid>', methods=['GET'])
 def show_book(bid):
     conn = dbi.connect()
