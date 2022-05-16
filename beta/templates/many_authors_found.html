@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+    {% block main_content %}
+        <p>Authors matching {{ frag }}</p>
+        <ol>
+            {% for person in group %}
+            <li><a href="{{url_for('show_author', aid=person.aid)}}">{{ person.author }} </a></li>
+            {% endfor %}
+        </ol>
+    {% endblock %}

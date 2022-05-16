@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+
+<h1>Reply to the reply for the review</h1>
+
+<form method="post" action="{{url_for(post_reply, review_id = review_id, uid = uid)}}">
+    <fieldset>
+    <legend>Your reply to the review</legend>
+    <table>
+    <tr><td><label for="content" accesskey="c">Your reply:</label></td>
+        <td><input id="content" type="text" name="content"></td></tr>
+    </table>
+    </fieldset>
+    
+    <p> <input type='submit' value='Post Reply'> </p>
+</form>
+
+{% endblock %}

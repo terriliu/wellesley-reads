@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block nav %}
+{% endblock %}
+
+{% block search %}
+{% endblock %}
+
+{% block main_content %}
+<h1>Hello!</h1>
+
+<p>You are not logged in.</p>
+
+<p><a href = "{{ url_for('login') }}">Log in</a></p>
+
+<p><a href = "{{ url_for('join') }}">Sign up</a></p>
+
+{% endblock %}

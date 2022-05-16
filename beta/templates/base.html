@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang='en'>
+<head>
+    <meta charset='utf-8'>
+    <!-- for mobile-friendly pages -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name=author content="">
+    <title>{{ page_title }}</title>
+    <link rel='stylesheet' href="{{url_for('static', filename = 'style.css')}}">
+    {% block head_stuff %} {% endblock %}
+</head>
+<body>
+
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div id="messages">
+  {% for msg in messages %}
+  <p>{{msg}}</p>
+  {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+            
+{% block nav %}
+<nav>
+  <ul>
+    <li><a href="{{url_for('user_profile', uid=session['uid'])}}">my profile</a></li>
+    <li><a href="{{url_for('logout')}}">logout</a></li>
+  </ul>
+</nav>
+{% endblock %}
+
+{% block search %}
+<form method=GET action="{{url_for('submission_handler')}}">
+  <p>
+      <label>search:<input required name="query" type="text"></label>
+      <label>kind
+          <select name="kind" required>
+              <option value="">Choose One</option>
+              <option value="author">author name</option>
+              <option value="book">book title</option>
+              <option value="user">user name</option>
+          </select>
+      </label>
+      <input type="submit" value="submit">
+  </p>
+</form>
+{% endblock %}
+
+{% block main_content %}
+<h1>Welcome!</h1>
+{% endblock %}
+
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  {% block end_scripts %}
+  {% endblock %}
+  
+</body>
+</html>

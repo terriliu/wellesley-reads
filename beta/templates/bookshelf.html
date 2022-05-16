@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+<h1>{{shelf_name}}</h1>
+<ol> 
+    {% for book in books %}
+    <li><a href="{{ url_for('show_book', bid=book.bid) }}">{{book.bname}}</a></li>
+    {% endfor %}
+</ol> 
+{% endblock %}

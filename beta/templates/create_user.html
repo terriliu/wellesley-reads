@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block nav %}
+{% endblock %}
+
+{% block search %}
+{% endblock %}
+
+{% block main_content %}
+<h1>Create user</h1>
+
+<form action = "{{url_for('join')}}" method = "post" enctype="multipart/form-data">
+    <p>Username: <input type = text name = username></p>
+    <p>Password: <input type = text name = password1></p>
+    <p>Repeat password: <input type = text name = password2></p>
+    <p>About: <input type = text name = about></p>
+    <p>Fav genres:</p>
+    <input type = checkbox name = genre id="C1" value = "romance"><label for = "C1">romance</label>
+    <input type = checkbox name = genre id="C2" value = "mystery"><label for = "C2">mystery</label> 
+    <input type = checkbox name = genre id="C3" value = "science-fiction"><label for = "C3">science-fiction</label> 
+    <input type = checkbox name = genre id="C4" value = "nonfiction"><label for = "C4">nonfiction</label>
+    <input type = checkbox name = genre id="C5" value = "fiction"><label for = "C5">fiction</label>
+    <input type = checkbox name = genre id="C6" value = "horror"><label for = "C6">horror</label>
+    <p>Upload profile picture:</p>
+    <p><label>Pic: <input type="file" name="pic"></label></p>
+    <p><input type = submit value = Create></p>
+</form>
+
+{% endblock %}

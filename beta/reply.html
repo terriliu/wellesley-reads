@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block main_content %}
+<h1>{{uname}} replied to the review {{review}} on {{bname}} </h1>
+<p>
+    {{content}} (posted on {{date}})
+</p>
+
+<h2>Other replies to the review:</h2>
+<ul> 
+    {% for reply in replies %}
+    <li>
+        <a href="{{ url_for('.user_profile', uid=reply.get('uid')) }}">{{reply.get('uname')}}</a>: "{{reply.get('content')}}" (posted on {{reply.get('reply_date')}})
+    </li>
+    {% endfor %}
+</ul> 
+
+{% endblock %}
