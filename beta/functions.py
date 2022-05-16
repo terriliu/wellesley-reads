@@ -177,6 +177,16 @@ def add_shelf(conn, uid, shelf):
     curs.execute(sql, [uid, shelf])
     conn.commit()
 
+def get_profile_pic(conn, uid, app):
+    curs = dbi.dict_cursor(conn)
+    numrows = curs.execute('''select filename from picfile where `uid` = %s''',
+                            [uid])
+    if numrows == 0:
+        flash('No picture for {}'.format(uid))
+        return
+    row = curs.fetchone()
+    return os.path.join(app.config['UPLOADS'],row['filename'])
+
 
 if __name__ == '__main__':
     dbi.cache_cnf()

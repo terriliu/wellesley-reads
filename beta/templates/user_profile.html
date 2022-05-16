@@ -9,6 +9,7 @@
 
 {% else %}
 <h1>{{name}}'s profile</h1>
+<img src="{{url_for('pic',uid=uid)}}" alt="profile pic" width="100">
 <h2>About</h2>
 {% endif %}
 

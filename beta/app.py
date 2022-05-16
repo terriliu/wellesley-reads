@@ -188,6 +188,19 @@ def user_profile(uid):
                             genres = fav_genres, friends = friends,
                             shelves = shelves, session = session)
 
+@app.route('/pic/<uid>')
+def pic(uid):
+    conn = dbi.connect()
+    curs = dbi.dict_cursor(conn)
+    numrows = curs.execute(
+        '''select filename from picfile where `uid` = %s''',
+        [uid])
+    if numrows == 0:
+        flash('No picture for {}'.format(uid))
+        return send_from_directory(app.config['UPLOADS'],'default.jpg')
+    row = curs.fetchone()
+    return send_from_directory(app.config['UPLOADS'],row['filename'])
+
 @app.route('/edit/', methods=["GET", "POST"])
 def edit():
  
