@@ -23,6 +23,7 @@ app.secret_key = ''.join([ random.choice(('ABCDEFGHIJKLMNOPQRSTUVXYZ' +
 
 # This gets us better error messages for certain common request errors
 app.config['TRAP_BAD_REQUEST_ERRORS'] = True
+app.config['UPLOADS'] = 'uploads'
 
 @app.route('/')
 def index():
@@ -73,6 +74,11 @@ def join():
             flash('There was an error: {}'.format(repr(err)))
             return redirect(url_for('index'))
         flash('FYI, you were issued UID {}'.format(uid))
+        #auto-add 'Read' and 'Want to Read' bookshelves for new user
+        curs.execute('''INSERT INTO shelf(`uid`, shelf_name) VALUES(%s, %s)''', [uid, 'Read'])
+        conn.commit()
+        curs.execute('''INSERT INTO shelf(`uid`, shelf_name) VALUES(%s, %s)''', [uid, 'Want to Read'])
+        conn.commit()
         session['username'] = username
         session['uid'] = uid
         session['logged_in'] = True
