@@ -2,8 +2,10 @@
 
 {% block main_content %}
 <h1>Review on {{review.get('bname')}} by {{uname}}</h1>
+<div class="current-review">
 <p>{{review.get('content')}} (posted on {{review.get('post_date')}})</p>
 <p>Rating: {{review.get('rating')}} stars</p>
+</div>
 
 
 <h2>Your ({{sesh_user}}) reply</h2>
@@ -23,6 +25,8 @@
         <a href="{{ url_for('.user_profile', uid=reply.get('uid')) }}">{{reply.get('uname')}}</a>: "{{reply.get('content')}}" (posted on {{reply.get('reply_date')}})
     </li>
     {% endif %}
+    {%else%}
+    <p>There are no replies to this review yet.</p>
     {% endfor %}
 </ul> 
 

@@ -28,10 +28,10 @@
 <p>Rating: {{sesh_user_review.get('rating')}}</p>
 <p>Review: {{sesh_user_review.get('content')}}</p>
 <p>Date posted: {{sesh_user_review.get('post_date')}}</p>
-</div>
 {% else %}
 <p>You haven't posted a review. <a href="{{ url_for('.post_review', uid=sesh_uid, bid=bid) }}">Create a post!</a></p>
 {% endif %}
+</div>
 
 <div class="other-review">
 <h2>Reviews</h2>
@@ -44,6 +44,8 @@
         <a href="{{ url_for('.show_review', review_id=review.get('review_id')) }}">Click here to view replies</a>
     </li>
     {% endif %}
+    {%else%}
+        <p>There are no reviews yet.</p>
     {% endfor %}
 </ul> 
 </div>
