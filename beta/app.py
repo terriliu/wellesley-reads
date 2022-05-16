@@ -20,7 +20,7 @@ app.secret_key = ''.join([ random.choice(('ABCDEFGHIJKLMNOPQRSTUVXYZ' +
                                           'abcdefghijklmnopqrstuvxyz' +
                                           '0123456789'))
                            for i in range(20) ])
-app.config['UPLOADS'] = 'uploads'
+
 # This gets us better error messages for certain common request errors
 app.config['TRAP_BAD_REQUEST_ERRORS'] = True
 
@@ -37,48 +37,46 @@ def join():
         passwd1 = request.form.get('password1')
         passwd2 = request.form.get('password2')
         about = request.form.get('about')
-        genres = request.form.getlist('genre')
-        f = request.files['pic']
-        user_filename = f.filename
-        ext = user_filename.split('.')[-1]
+        romance = request.form.get('romance')
+        mystery = request.form.get('mystery')
+        scifi = request.form.get('science-fiction')
+        nonfiction = request.form.get('nonfiction')
+        fiction = request.form.get('fiction')
+        horror = request.form.get('horror')
         fav_genres = ""
-        for genre in genres:
-            fav_genres = fav_genres + "," + genre
+        for genre in [romance, mystery, scifi, nonfiction, fiction, horror]:
+            if genre:
+                fav_genres = fav_genres + "," + genre
         if passwd1 != passwd2:
             flash('passwords do not match')
             return redirect( url_for('index'))
         hashed = bcrypt.hashpw(passwd1.encode('utf-8'),
                             bcrypt.gensalt())
         stored = hashed.decode('utf-8')
+        print(passwd1, type(passwd1), hashed, stored)
+        conn = dbi.connect()
+        curs = dbi.cursor(conn)
         try:
-            conn = dbi.connect()
-            curs = dbi.dict_cursor(conn)
             curs.execute('''INSERT INTO user(`uid`,uname,hashed,bio,fav_genres)
                             VALUES(null,%s,%s,%s,%s)''',
                         [username, stored, about, fav_genres])
             conn.commit()
-            curs.execute('select last_insert_id()')
-            row = curs.fetchone()
-            print("row is", row)
-            uid = row['last_insert_id()']
-            filename = secure_filename('{}.{}'.format(uid,ext))
-            pathname = os.path.join(app.config['UPLOADS'],filename)
-            f.save(pathname)
-            curs.execute('''INSERT INTO picfile(`uid`,filename) 
-                        VALUES (%s,%s)
-                        ON DUPLICATE KEY UPDATE filename = %s''',
-                        [uid, filename, filename])
-            conn.commit()
         except Exception as err:
-            flash('There was an error: {}'.format(repr(err)))
+            flash('That username is taken: {}'.format(repr(err)))
             return redirect(url_for('index'))
+        curs.execute('select last_insert_id()')
+        row = curs.fetchone()
+        uid = row[0]
         flash('FYI, you were issued UID {}'.format(uid))
+        #auto-add 'Read' and 'Want to Read' bookshelves for new user
+        curs.execute('''INSERT INTO shelf(`uid`, shelf_name) VALUES(%s, %s)''', [uid, 'Read'])
+        conn.commit()
+        curs.execute('''INSERT INTO shelf(`uid`, shelf_name) VALUES(%s, %s)''', [uid, 'Want to Read'])
+        conn.commit()
         session['username'] = username
         session['uid'] = uid
         session['logged_in'] = True
-        numrows = curs.execute('''select filename from picfile where `uid` = %s''',
-                            [uid])
-        row = curs.fetchone()
+        session['visits'] = 1
         return redirect( url_for('user_profile', uid=uid) )
 
 @app.route('/login/', methods=['GET', 'POST'])
@@ -113,6 +111,7 @@ def login():
             session['username'] = username
             session['uid'] = row['uid']
             session['logged_in'] = True
+            session['visits'] = 1
             return redirect( url_for('user_profile', uid=session['uid']) )
         else:
             flash('login incorrect. Try again or join')
@@ -178,7 +177,6 @@ def submission_handler():
 @app.route('/user/<uid>', methods=['GET'])
 def user_profile(uid):
     conn = dbi.connect()
-    curs = dbi.dict_cursor(conn)
     user_info = functions.get_user_info(conn, uid) 
     uname = user_info.get('uname')
     bio = user_info.get('bio')
@@ -189,7 +187,7 @@ def user_profile(uid):
     return render_template('user_profile.html', uid = uid, name = uname, bio = bio, 
                             genres = fav_genres, friends = friends,
                             shelves = shelves, session = session)
-                            
+
 @app.route('/edit/', methods=["GET", "POST"])
 def edit():
  
@@ -223,25 +221,19 @@ def edit():
  
        return redirect( url_for('user_profile', uid=uid) )
 
-@app.route('/pic/<uid>')
-def pic(uid):
-    conn = dbi.connect()
-    curs = dbi.dict_cursor(conn)
-    numrows = curs.execute(
-        '''select filename from picfile where `uid` = %s''',
-        [uid])
-    if numrows == 0:
-        flash('No picture for {}'.format(uid))
-        return send_from_directory(app.config['UPLOADS'],'default.jpg')
-    row = curs.fetchone()
-    return send_from_directory(app.config['UPLOADS'],row['filename'])
-
 @app.route('/shelf/<shelf_id>', methods=['GET'])
 def display_shelf(shelf_id):
     conn = dbi.connect()
     books = functions.get_shelf_books(conn, shelf_id)
-    shelf_name = books[0].get('shelf_name')
-    return render_template('bookshelf.html', books = books, shelf_name = shelf_name)    
+    if len(books) != 0:
+        shelf_name = books[0].get('shelf_name')
+        return render_template('bookshelf.html', books = books, shelf_name = shelf_name)    
+    else:
+        curs = dbi.dict_cursor(conn)
+        curs.execute('''select shelf_name from shelf where shelf_id = %s''', [shelf_id])
+        shelf_name = curs.fetchone().get('shelf_name')
+        return render_template('empty_bookshelf.html', shelf_name = shelf_name)
+
 
 @app.route('/all-books', methods=['GET'])
 def all_books():
@@ -255,6 +247,11 @@ def all_books():
 def show_book(bid):
     conn = dbi.connect()
     book_info = functions.get_book(conn, bid)
+    title = book_info.get('bname')
+    author = book_info.get('author')
+    author_id = book_info.get('aid')
+    genre = book_info.get('genre')
+    avg_rating = book_info.get('avg_rating')
     all_reviews = functions.get_reviews(conn, bid)
     username = session['username']
     sesh_uid = functions.get_user_id(conn, username)
@@ -265,7 +262,9 @@ def show_book(bid):
             sesh_user_has_posted = True
             sesh_user_review = review
     shelves = functions.get_shelves(conn, sesh_uid)
-    return render_template('book.html', book = book_info, bid = bid, 
+    return render_template('book.html', title = title, bid = bid,
+                            genre = genre, avg_rating = avg_rating,
+                            author = author, aid = author_id, 
                             sesh_user_has_posted = sesh_user_has_posted,
                             all_reviews = all_reviews, shelves = shelves,
                             sesh_user_review = sesh_user_review, 
@@ -288,7 +287,11 @@ def post_review(bid, uid):
 def show_review(review_id):
     conn = dbi.connect()
     review = functions.get_review(conn, review_id)
+    book = review.get('bname')
     uname = review.get('uname')
+    date = review.get('post_date')
+    content = review.get('content')
+    rating = review.get('rating')
     all_replies = functions.get_replies(conn, review_id)
     username = session['username']
     sesh_uid = functions.get_user_id(conn, username)
@@ -298,8 +301,9 @@ def show_review(review_id):
         if reply.get('uname') == username:
             sesh_user_has_replied = True
             sesh_user_reply = reply
-    return render_template('review.html', uname=uname, review = review,
-                            review_id=review_id, all_replies=all_replies,
+    return render_template('review.html', book=book, uname=uname, date=date,
+                            review_id=review_id,content=content,rating=rating,
+                            all_replies=all_replies,
                             sesh_user_has_replied=sesh_user_has_replied,
                             sesh_user_reply=sesh_user_reply,
                             sesh_uid=sesh_uid, sesh_user=username
@@ -316,7 +320,7 @@ def post_reply(review_id,uid):
         conn = dbi.connect()
         functions.post_reply(conn, uid, review_id, request.form['content'])
         flash('replied!')
-        return redirect( url_for('show_review', review_id=review_id))
+        return redirect(url_for('show_review', review_id=review_id))
 
 @app.route('/author/<aid>', methods=['GET'])
 def show_author(aid):
@@ -351,6 +355,14 @@ def add_to_shelf(bid):
         flash('Added to your ' + str(shelf_name) + ' bookshelf')
     return redirect(url_for('show_book', bid = bid))
 
+@app.route('/shelf/', methods = ['POST'])
+def new_shelf():
+    conn = dbi.connect()
+    username = session['username']
+    sesh_uid = functions.get_user_id(conn, username)
+    shelf_name = request.form['shelf']
+    functions.add_shelf(conn, sesh_uid, shelf_name)
+    return redirect(url_for('user_profile', uid = sesh_uid))
 
 # Below routes are from the flask starter
 @app.route('/greet/', methods=["GET", "POST"])
@@ -368,6 +380,28 @@ def greet():
         except Exception as err:
             flash('form submission error'+str(err))
             return redirect( url_for('index') )
+
+@app.route('/formecho/', methods=['GET','POST'])
+def formecho():
+    if request.method == 'GET':
+        return render_template('form_data.html',
+                               method=request.method,
+                               form_data=request.args)
+    elif request.method == 'POST':
+        return render_template('form_data.html',
+                               method=request.method,
+                               form_data=request.form)
+    else:
+        # maybe PUT?
+        return render_template('form_data.html',
+                               method=request.method,
+                               form_data={})
+
+@app.route('/testform/')
+def testform():
+    # these forms go to the formecho route
+    return render_template('testform.html')
+
 
 @app.before_first_request
 def init_db():
