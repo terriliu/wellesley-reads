@@ -4,7 +4,6 @@ from flask import (Flask, render_template, make_response, url_for, request,
 redirect, flash, session, send_from_directory, jsonify)
 from werkzeug.utils import secure_filename
 from datetime import datetime
-import os
 
 app = Flask(__name__)
 
@@ -44,6 +43,12 @@ def get_shelf_books(conn, shelf_id):
 
 def get_book(conn, bid):
     curs = dbi.dict_cursor(conn)
+    curs.execute('''select avg(rating) as avg from review where bid=%s;''', [bid])
+    avg = curs.fetchone().get('avg')
+    if avg != None:
+        avg = round(avg, 1)
+    curs.execute('''update book set avg_rating = %s where bid = %s''', [avg, bid])
+    conn.commit()
     curs.execute('''select book.bid, book.bname, book.genre, 
                     book.avg_rating, author.aid, author.author from book 
                     inner join author using (aid) 
@@ -161,15 +166,12 @@ def get_user_list(conn, uname):
                     ['%' + uname + '%'])
     return curs.fetchall()
 
-def get_profile_pic(conn, uid, app):
+def add_shelf(conn, uid, shelf):
     curs = dbi.dict_cursor(conn)
-    numrows = curs.execute('''select filename from picfile where `uid` = %s''',
-                            [uid])
-    if numrows == 0:
-        flash('No picture for {}'.format(uid))
-        return
-    row = curs.fetchone()
-    return os.path.join(app.config['UPLOADS'],row['filename'])
+    sql = ('''INSERT INTO shelf (`uid`, shelf_name) VALUES (%s, %s);''')
+    curs.execute(sql, [uid, shelf])
+    conn.commit()
+
 
 if __name__ == '__main__':
     dbi.cache_cnf()

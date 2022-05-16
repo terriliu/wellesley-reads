@@ -4,14 +4,11 @@
 
 {% if uid == session['uid'] %}
 <h1>Hi {{name}}!</h1>
-<img src="{{url_for('pic',uid=uid)}}" alt="profile pic" width="100">
-<p><a href="{{url_for('edit')}}">My Profile</a></p>
-
+<p><a href="{{url_for('edit')}}">Edit Profile</a></p>
 <h2>About Me</h2>
 
 {% else %}
 <h1>{{name}}'s profile</h1>
-<img src="{{url_for('pic',uid=uid)}}" alt="profile pic" width="100">
 <h2>About</h2>
 {% endif %}
 
@@ -33,5 +30,10 @@
     <li><a href="{{ url_for('.display_shelf', shelf_id=shelf.get('shelf_id')) }}">{{shelf.get('shelf_name')}}</a></li>
     {% endfor %}
 </ul> 
+<p>Add a new shelf: <p>
+<form method='post' action="{{url_for('new_shelf')}}">
+    <input type = text name = shelf>
+    <input type="submit" value="Create">
+</form>
 
 {% endblock %}
