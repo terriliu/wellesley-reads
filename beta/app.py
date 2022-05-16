@@ -189,6 +189,39 @@ def user_profile(uid):
     return render_template('user_profile.html', uid = uid, name = uname, bio = bio, 
                             genres = fav_genres, friends = friends,
                             shelves = shelves, session = session)
+                            
+@app.route('/edit/', methods=["GET", "POST"])
+def edit():
+ 
+   if request.method == 'GET':
+ 
+       return render_template('edit.html')
+ 
+   else:
+ 
+       about = request.form.get('about')
+       romance = request.form.get('romance')
+       mystery = request.form.get('mystery')
+       scifi = request.form.get('science-fiction')
+       nonfiction = request.form.get('nonfiction')
+       fiction = request.form.get('fiction')
+       horror = request.form.get('horror')
+       fav_genres = ""
+ 
+       for genre in [romance, mystery, scifi, nonfiction, fiction, horror]:
+               if genre:
+                   fav_genres = fav_genres + "," + genre
+       uid = session['uid']
+       conn = dbi.connect()
+       curs = dbi.dict_cursor(conn)
+ 
+       curs.execute('''update user
+                   set bio = %s, fav_genres = %s
+                   where uid = %s''', [about, fav_genres, uid])
+ 
+       conn.commit()
+ 
+       return redirect( url_for('user_profile', uid=uid) )
 
 @app.route('/pic/<uid>')
 def pic(uid):

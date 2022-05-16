@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+ 
+{% block nav %}
+{% endblock %}
+ 
+{% block search %}
+{% endblock %}
+ 
+{% block main_content %}
+<h1>Edit Profile</h1>
+ 
+<form action = "" method = "post">
+   <p>About: <p>
+      <textarea name = about rows="10" cols="30" wrap="soft"></textarea>
+   <p>Fav genres:</p>
+   <input type = checkbox name = romance id="C1" value = "romance"><label for = "C1">romance</label>
+   <input type = checkbox name = mystery id="C2" value = "mystery"><label for = "C2">mystery</label>
+   <input type = checkbox name = science-fiction id="C3" value = "science-fiction"><label for = "C3">science-fiction</label>
+   <input type = checkbox name = nonfiction id="C4" value = "nonfiction"><label for = "C4">nonfiction</label>
+   <input type = checkbox name = fiction id="C5" value = "fiction"><label for = "C5">fiction</label>
+   <input type = checkbox name = horror id="C6" value = "horror"><label for = "C6">horror</label>
+   <p><input type = submit value = Save Changes ></p>
+</form>
+ 
+{% endblock %}
