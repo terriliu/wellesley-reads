@@ -68,6 +68,11 @@ def join():
         row = curs.fetchone()
         uid = row[0]
         flash('FYI, you were issued UID {}'.format(uid))
+        #auto-add 'Read' and 'Want to Read' bookshelves for new user
+        curs.execute('''INSERT INTO shelf(`uid`, shelf_name) VALUES(%s, %s)''', [uid, 'Read'])
+        conn.commit()
+        curs.execute('''INSERT INTO shelf(`uid`, shelf_name) VALUES(%s, %s)''', [uid, 'Want to Read'])
+        conn.commit()
         session['username'] = username
         session['uid'] = uid
         session['logged_in'] = True
@@ -183,34 +188,72 @@ def user_profile(uid):
                             genres = fav_genres, friends = friends,
                             shelves = shelves, session = session)
 
+@app.route('/edit/', methods=["GET", "POST"])
+def edit():
+ 
+   if request.method == 'GET':
+ 
+       return render_template('edit.html')
+ 
+   else:
+ 
+       about = request.form.get('about')
+       romance = request.form.get('romance')
+       mystery = request.form.get('mystery')
+       scifi = request.form.get('science-fiction')
+       nonfiction = request.form.get('nonfiction')
+       fiction = request.form.get('fiction')
+       horror = request.form.get('horror')
+       fav_genres = ""
+ 
+       for genre in [romance, mystery, scifi, nonfiction, fiction, horror]:
+               if genre:
+                   fav_genres = fav_genres + "," + genre
+       uid = session['uid']
+       conn = dbi.connect()
+       curs = dbi.dict_cursor(conn)
+ 
+       curs.execute('''update user
+                   set bio = %s, fav_genres = %s
+                   where uid = %s''', [about, fav_genres, uid])
+ 
+       conn.commit()
+ 
+       return redirect( url_for('user_profile', uid=uid) )
+
 @app.route('/shelf/<shelf_id>', methods=['GET'])
 def display_shelf(shelf_id):
     conn = dbi.connect()
     books = functions.get_shelf_books(conn, shelf_id)
-    shelf_name = books[0].get('shelf_name')
-    return render_template('bookshelf.html', books = books, shelf_name = shelf_name)    
+    if len(books) != 0:
+        shelf_name = books[0].get('shelf_name')
+        return render_template('bookshelf.html', books = books, shelf_name = shelf_name)    
+    else:
+        curs = dbi.dict_cursor(conn)
+        curs.execute('''select shelf_name from shelf where shelf_id = %s''', [shelf_id])
+        shelf_name = curs.fetchone().get('shelf_name')
+        return render_template('empty_bookshelf.html', shelf_name = shelf_name)
+
 
 @app.route('/book/<bid>', methods=['GET'])
 def show_book(bid):
-    conn1 = dbi.connect()
-    book_info = functions.get_book(conn1, bid)
+    conn = dbi.connect()
+    book_info = functions.get_book(conn, bid)
     title = book_info.get('bname')
     author = book_info.get('author')
     author_id = book_info.get('aid')
     genre = book_info.get('genre')
     avg_rating = book_info.get('avg_rating')
-    conn2 = dbi.connect()
-    all_reviews = functions.get_reviews(conn2, bid)
+    all_reviews = functions.get_reviews(conn, bid)
     username = session['username']
-    conn3 = dbi.connect()
-    sesh_uid = functions.get_user_id(conn3, username)
+    sesh_uid = functions.get_user_id(conn, username)
     sesh_user_has_posted = False
     sesh_user_review = None
     for review in all_reviews:
         if review.get('uname') == username:
             sesh_user_has_posted = True
             sesh_user_review = review
-    shelves = functions.get_shelves(conn3, sesh_uid)
+    shelves = functions.get_shelves(conn, sesh_uid)
     return render_template('book.html', title = title, bid = bid,
                             genre = genre, avg_rating = avg_rating,
                             author = author, aid = author_id, 
@@ -306,6 +349,14 @@ def add_to_shelf(bid):
         flash('Added to your ' + str(shelf_name) + ' bookshelf')
     return redirect(url_for('show_book', bid = bid))
 
+@app.route('/shelf/', methods = ['POST'])
+def new_shelf():
+    conn = dbi.connect()
+    username = session['username']
+    sesh_uid = functions.get_user_id(conn, username)
+    shelf_name = request.form['shelf']
+    functions.add_shelf(conn, sesh_uid, shelf_name)
+    return redirect(url_for('user_profile', uid = sesh_uid))
 
 # Below routes are from the flask starter
 @app.route('/greet/', methods=["GET", "POST"])

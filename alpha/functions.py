@@ -43,6 +43,12 @@ def get_shelf_books(conn, shelf_id):
 
 def get_book(conn, bid):
     curs = dbi.dict_cursor(conn)
+    curs.execute('''select avg(rating) as avg from review where bid=%s;''', [bid])
+    avg = curs.fetchone().get('avg')
+    if avg != None:
+        avg = round(avg, 1)
+    curs.execute('''update book set avg_rating = %s where bid = %s''', [avg, bid])
+    conn.commit()
     curs.execute('''select book.bid, book.bname, book.genre, 
                     book.avg_rating, author.aid, author.author from book 
                     inner join author using (aid) 
@@ -159,6 +165,12 @@ def get_user_list(conn, uname):
                     where uname like %s;''',
                     ['%' + uname + '%'])
     return curs.fetchall()
+
+def add_shelf(conn, uid, shelf):
+    curs = dbi.dict_cursor(conn)
+    sql = ('''INSERT INTO shelf (`uid`, shelf_name) VALUES (%s, %s);''')
+    curs.execute(sql, [uid, shelf])
+    conn.commit()
 
 
 if __name__ == '__main__':
