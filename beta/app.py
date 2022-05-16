@@ -277,18 +277,16 @@ def post_review(bid, uid):
 
 @app.route('/review/<review_id>', methods=['GET'])
 def show_review(review_id):
-    conn1 = dbi.connect()
-    review = functions.get_review(conn1, review_id)
+    conn = dbi.connect()
+    review = functions.get_review(conn, review_id)
     book = review.get('bname')
     uname = review.get('uname')
     date = review.get('post_date')
     content = review.get('content')
     rating = review.get('rating')
-    conn2 = dbi.connect()
-    all_replies = functions.get_replies(conn2, review_id)
+    all_replies = functions.get_replies(conn, review_id)
     username = session['username']
-    conn3 = dbi.connect()
-    sesh_uid = functions.get_user_id(conn3, username)
+    sesh_uid = functions.get_user_id(conn, username)
     sesh_user_has_replied = False
     sesh_user_reply = None
     for reply in all_replies:

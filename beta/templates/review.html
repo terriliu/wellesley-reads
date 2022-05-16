@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
 {% block main_content %}
-<h1>Review on {{review.get('bname')}} by {{uname}}</h1>
+<h1>Review on {{book}} by {{uname}}</h1>
 <div class="current-review">
-<p>{{review.get('content')}} (posted on {{review.get('post_date')}})</p>
-<p>Rating: {{review.get('rating')}} stars</p>
+<p>{{content}} (posted on {{date}})</p>
+<p>Rating: {{rating}} stars</p>
 </div>
 
 
@@ -13,7 +13,7 @@
 <p>Reply: {{sesh_user_reply.get('content')}}</p>
 <p>Date replied: {{sesh_user_reply.get('reply_date')}}</p>
 {% else %}
-<p>You haven't posted a reply. <a href="{{ url_for('.post_reply', uid=sesh_uid, review_id=review_id) }}">Reply to this review!</a></p>
+<p>You haven't posted a reply. <a href="{{ url_for('post_reply', uid=sesh_uid, review_id=review_id) }}">Reply to this review!</a></p>
 {% endif %}
 
 
@@ -22,7 +22,7 @@
     {% for reply in all_replies %}
     {% if reply.get('uname') != sesh_user %}
     <li>
-        <a href="{{ url_for('.user_profile', uid=reply.get('uid')) }}">{{reply.get('uname')}}</a>: "{{reply.get('content')}}" (posted on {{reply.get('reply_date')}})
+        <a href="{{ url_for('user_profile', uid=reply.get('uid')) }}">{{reply.get('uname')}}</a>: "{{reply.get('content')}}" (posted on {{reply.get('reply_date')}})
     </li>
     {% endif %}
     {%else%}
