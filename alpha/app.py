@@ -204,25 +204,23 @@ def display_shelf(shelf_id):
 
 @app.route('/book/<bid>', methods=['GET'])
 def show_book(bid):
-    conn1 = dbi.connect()
-    book_info = functions.get_book(conn1, bid)
+    conn = dbi.connect()
+    book_info = functions.get_book(conn, bid)
     title = book_info.get('bname')
     author = book_info.get('author')
     author_id = book_info.get('aid')
     genre = book_info.get('genre')
     avg_rating = book_info.get('avg_rating')
-    conn2 = dbi.connect()
-    all_reviews = functions.get_reviews(conn2, bid)
+    all_reviews = functions.get_reviews(conn, bid)
     username = session['username']
-    conn3 = dbi.connect()
-    sesh_uid = functions.get_user_id(conn3, username)
+    sesh_uid = functions.get_user_id(conn, username)
     sesh_user_has_posted = False
     sesh_user_review = None
     for review in all_reviews:
         if review.get('uname') == username:
             sesh_user_has_posted = True
             sesh_user_review = review
-    shelves = functions.get_shelves(conn3, sesh_uid)
+    shelves = functions.get_shelves(conn, sesh_uid)
     return render_template('book.html', title = title, bid = bid,
                             genre = genre, avg_rating = avg_rating,
                             author = author, aid = author_id, 
@@ -318,6 +316,14 @@ def add_to_shelf(bid):
         flash('Added to your ' + str(shelf_name) + ' bookshelf')
     return redirect(url_for('show_book', bid = bid))
 
+@app.route('/shelf/', methods = ['POST'])
+def new_shelf():
+    conn = dbi.connect()
+    username = session['username']
+    sesh_uid = functions.get_user_id(conn, username)
+    shelf_name = request.form['shelf']
+    functions.add_shelf(conn, sesh_uid, shelf_name)
+    return redirect(url_for('user_profile', uid = sesh_uid))
 
 # Below routes are from the flask starter
 @app.route('/greet/', methods=["GET", "POST"])

@@ -31,4 +31,9 @@
     {% endfor %}
 </ul> 
 
+<form method='post' action="{{url_for('new_shelf')}}">
+    Add a new shelf: <input type = text name = shelf>
+    <input type="submit" value="Create">
+</form>
+
 {% endblock %}
