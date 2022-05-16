@@ -2,30 +2,40 @@
 */
 
 HTML {
-    --color-header: #007ea9;  /* color for H1-H6 and others. was deepskyblue but poor contrast. */
+    --color-header: #8a00a947;  /* color for H1-H6 and others. was deepskyblue but poor contrast. */
     --color-hilite: #b50000;  /* was red, but this avoids WAVE contrast errors */ 
-    --color-focus: #56B929;
-    --font-family: Verdana;
-    font-family: var(--font-family)
+    --color-focus: #38cfc3;
+    --font-family: monospace;
+    font-family: var(--font-family);
+    background-color: aliceblue;
 }
 
-/* For flashed messages; make them stand out using red and italics */
+/* For flashed messages; make them stand out using red and italics and bold */
 
 #messages {
     color: var(--color-hilite);
     font-style: italic;
+    font-weight: bold;
 }
 
 
 h1 {
-    font-size: 200%;
-    color: var(--color-header);
+    font-size: 300%;
+    color: rgb(6, 6, 83);
 }
 
 h2, h3 {
-    color: var(--color-header);
+    color: purple;
 }
-    
+
+p,form {
+    font-size:130%;
+    color: rgba(47, 168, 255, 0.9);
+}
+
+li {
+    font-size:130%;
+}
 
 /* for a simple navbar. Talk to Scott if you want drop-downs. */
 nav > ul {
