@@ -179,6 +179,7 @@ def submission_handler():
 @app.route('/user/<uid>', methods=['GET'])
 def user_profile(uid):
     conn = dbi.connect()
+    curs = dbi.dict_cursor(conn)
     user_info = functions.get_user_info(conn, uid) 
     uname = user_info.get('uname')
     bio = user_info.get('bio')
